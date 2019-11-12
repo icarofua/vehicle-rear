@@ -14,11 +14,11 @@ The [dataset](http://www.inf.ufpr.br/vri/databases/vehicle-reid/data.tgz) and [v
 
 ## Authors
 
-- Ícaro Oliveira de Oliveira (UTFPR)
-- Rayson Laroca (UFPR)
-- David Menotti (UFPR)
-- Keiko Veronica Ono Fonseca (UTFPR)
-- Rodrigo Minetto (UTFPR)
+- Ícaro Oliveira de Oliveira (UTFPR) [mailto](mailto:icarofua@gmail.com)
+- Rayson Laroca (UFPR) [mailto](mailto:raysonlaroca@gmail.com)
+- David Menotti (UFPR) [mailto](mailto:menottid@gmail.com)
+- Keiko Veronica Ono Fonseca (UTFPR) [mailto](mailto:keikoveronicaono@gmail.com)
+- Rodrigo Minetto (UTFPR) [mailto](mailto:rodrigo.minetto@gmail.com)
 
 This work addresses the problem of vehicle re-identification through a network of non-overlapping cameras. As our main contribution, we propose a novel two-stream convolutional neural network (CNN) that simultaneously uses two of the most distinctive and persistent features available: the vehicle appearance and its license plate. This is an attempt to tackle a major problem, false alarms caused by vehicles with similar design or by very close license plate identifiers.
 

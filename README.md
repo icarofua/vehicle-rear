@@ -9,8 +9,10 @@
         year={2019}
     } -->
 
-## Dataset Download
-The [dataset](http://www.inf.ufpr.br/vri/databases/vehicle-reid/data.tgz) and [videos](http://www.inf.ufpr.br/vri/databases/vehicle-reid/videos.tgz) are publicly available.
+## Download
+- [dataset](http://www.inf.ufpr.br/vri/databases/vehicle-reid/data.tgz)
+- [videos](http://www.inf.ufpr.br/vri/databases/vehicle-reid/videos.tgz)
+- [models](http://www.inf.ufpr.br/vri/databases/vehicle-reid/models.tgz)
 
 ## Authors
 

@@ -9,6 +9,8 @@
         year={2019}
     } -->
 
+##Dataset Download
+The [dataset](http://www.inf.ufpr.br/vri/databases/vehicle-reid/data.tgz) and [videos](http://www.inf.ufpr.br/vri/databases/vehicle-reid/videos.tgz) are publicly available.
 
 ## Authors
 
@@ -30,7 +32,7 @@ In our experiments, we achieved a precision, recall and F-score values of 99.6%,
 
 ![Alt text](fig3.png)
 
-As part of this work, we created an important dataset for vehicle re-identification with more than three hours of videos spanning almost 3,000 vehicles. The [dataset](http://www.inf.ufpr.br/vri/databases/vehicle-reid/data.tgz) and [videos](http://www.inf.ufpr.br/vri/databases/vehicle-reid/videos.tgz) are publicly available.
+As part of this work, we created an important dataset for vehicle re-identification with more than three hours of videos spanning almost 3,000 vehicles. 
 
 ## 1. Installation of the packages
 pip install keras tensorflow scikit-learn futures imgaug

@@ -159,8 +159,8 @@ Example of test.json:
   "probs2":[[0.0,0.5,0.4,0.3,1.0,0.2,0.1], [1.0,0.4,0.3,0.5,1.0,0.8,0.9],[1.0,0.4,0.3,0.5,1.0,0.8,0.9]]
 }
 
-## 5. generate the datasets
-You can generate the datasets to 1 image or for temporal stream between 2 to 5 images.
+## 5. Generating the Datasets
+You can generate the datasets for 1 image or the temporal stream between 2 to 5 images.
 
 Example: python generate_n_sets.py 1
 or

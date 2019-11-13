@@ -28,13 +28,13 @@ This work addresses the problem of vehicle re-identification through a network o
 
 As our main contribution, we propose a novel two-stream convolutional neural network (CNN) that simultaneously uses two of the most distinctive and persistent features available: the vehicle appearance and its license plate. This is an attempt to tackle a major problem, false alarms caused by vehicles with similar design or by very close license plate identifiers.
 
-![Alt text](fig2.png)
-
 In our experiments, we achieved a precision, recall and F-score values of 99.6%, 99.2% and 99.4%, respectively.
 
-![Alt text](fig3.png)
+![Alt text](fig2.png)
 
 As another contribution, we discuss and compare three alternative architectures that explore the same features but using additional streams and temporal information.
+
+![Alt text](fig3.png)
 
 ## 1. Installation of the packages
 pip install keras tensorflow scikit-learn futures imgaug

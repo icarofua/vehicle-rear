@@ -27,7 +27,10 @@ This work addresses the problem of vehicle re-identification through a network o
 ![Alt text](fig1.png)
 
 As our main contribution, we propose a novel two-stream convolutional neural network (CNN) that simultaneously uses two of the most distinctive and persistent features available: the vehicle appearance and its license plate. This is an attempt to tackle a major problem, false alarms caused by vehicles with similar design or by very close license plate identifiers.
-
+In the first network stream, shape similarities are identified by a Siamese CNN that uses a pair of low-resolution vehicle patches recorded by two different cameras. 
+In the second stream, we use a CNN for optical character recognition (OCR) to extract textual information, confidence scores, and string similarities from a pair of high-resolution license plate patches. 
+Then, features from both streams are merged by a sequence of fully connected layers for decision. 
+As part of this work, we created an important dataset for vehicle re-identification with more than three hours of videos spanning almost 3,000 vehicles.
 In our experiments, we achieved a precision, recall and F-score values of 99.6%, 99.2% and 99.4%, respectively.
 
 ![Alt text](fig2.png)

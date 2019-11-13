@@ -1,13 +1,15 @@
 # Demo code for journal "Vehicle Re-identification: exploring feature fusion using multi-stream convolutional networks".
 
-<!-- If you find this code useful in your research, please consider citing:
+## Citation
 
-    @article{icaroICIP2019,
-        title={A Two-Stream Siamese Neural Network for Vehicle Re-Identification by Using Non-Overlapping Cameras},
-        author={de Oliveira, Icaro O and Fonseca, Keiko VO and Minetto, Rodrigo},
-        journal={IEEE International Conference on Image Processing (ICIP)},
-        year={2019}
-    } -->
+If you find our work useful in your research, please cite our paper:
+
+    @article{vehicleReId,
+        title={Vehicle Re-identification: exploring feature fusion using multi-stream convolutional networks},
+        author={de Oliveira, Icaro O and Laroca, Rayson and Menotti, David and Fonseca, Keiko VO and Minetto, Rodrigo},
+        journal={?},
+        year={?}
+    }
 
 ## Download
 - [dataset](http://www.inf.ufpr.br/vri/databases/vehicle-reid/data.tgz)

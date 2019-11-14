@@ -1,15 +1,18 @@
-# Demo code for journal "Vehicle Re-identification: exploring feature fusion using multi-stream convolutional networks".
+# Demo code for journal "Vehicle Re-identification: exploring feature fusion using multi-stream convolutional networks". (https://arxiv.org/abs/1911.05541)
 
 ## Citation
 
 If you find our work useful in your research, please cite our paper:
 
-    @article{vehicleReId,
-        title={Vehicle Re-identification: exploring feature fusion using multi-stream convolutional networks},
-        author={de Oliveira, Icaro O and Laroca, Rayson and Menotti, David and Fonseca, Keiko VO and Minetto, Rodrigo},
-        journal={?},
-        year={?}
-    }
+	@article{oliveira2019vehicle,
+	  author = {I. O. {de Oliveira} and R. {Laroca} and D. {Menotti} and K. V. O. {Fonseca} and R. {Minetto}},
+	  title = {Vehicle Re-identification: exploring feature fusion using multi-stream convolutional networks},
+	  journal = {arXiv preprint},
+	  volume = {arXiv:1911.05541},
+	  number = {},
+	  pages = {1-11},
+	  year = {2019},
+	}
 
 ## Download
 - [dataset](http://www.inf.ufpr.br/vri/databases/vehicle-reid/data.tgz)

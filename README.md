@@ -175,3 +175,10 @@ You can generate the datasets for 1 image or the temporal stream between 2 to 5 
 Example: python generate_n_sets.py 1
 or
 python generate_n_sets.py 2
+
+## 6. OCR model
+
+In the OCR folder under models (models.tgz), you must first run "make" in the "darknet" folder 
+to compile Darknet and then run "python3 cnn-ocr.py" in the same folder to run the CNN-OCR 
+model.
+For more information, please refer to the README.txt file in the OCR folder.

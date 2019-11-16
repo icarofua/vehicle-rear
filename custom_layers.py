@@ -486,3 +486,174 @@ def process_load(f1, vec_size):
     _i1 = image.load_img(f1, target_size=vec_size)
     _i1 = image.img_to_array(_i1, dtype='uint8')
     return _i1
+
+#------------------------------------------------------------------------------
+def load_img(img, vec_size, vec_size2, use_metadata=False):
+  iplt0 = process_load(img[0][0], vec_size)
+  iplt1 = process_load(img[2][0], vec_size)
+  iplt2 = process_load(img[1][0], vec_size2)
+  iplt3 = process_load(img[3][0], vec_size2)
+
+  d1 = {"i0":iplt0,
+        "i1":iplt1,
+        "i2":iplt2,
+        "i3":iplt3,
+        "l":img[4],
+        "p1":img[0][0],
+        "p2":img[2][0],
+        "c1":img[5]['color'],
+        "c2":img[5]['color']
+        }
+  if use_metadata:
+    diff = abs(np.array(metadata_dict[img[0][0]][:7]) - np.array(metadata_dict[img[2][0]][:7])).tolist()
+    for i in range(len(diff)):
+      diff[i] = 1 if diff[i] else 0
+    d1['metadata'] = np.array(metadata_dict[img[0][0]] + metadata_dict[img[2][0]] + diff)
+
+  return d1
+
+#------------------------------------------------------------------------------
+def generator(features, batch_size, executor, vec_size, vec_size2, augmentation=False, with_paths=False):
+  N = len(features)
+  indices = np.arange(N)
+  batchInds = get_batch_inds(batch_size, indices, N)
+
+  while True:
+    for inds in batchInds:
+      futures = []
+      _vec_size = (len(inds),) + vec_size
+      b1 = np.zeros(_vec_size)
+      b2 = np.zeros(_vec_size)
+      _vec_size2 = (len(inds),) + vec_size2
+      b3 = np.zeros(_vec_size2)
+      b4 = np.zeros(_vec_size2)
+
+      blabels = np.zeros((len(inds)))
+      p1 = []
+      p2 = []
+      c1 = []
+      c2 = []
+
+      futures = [executor.submit(partial(load_img, features[index], vec_size, vec_size2)) for index in inds]
+      results = [future.result() for future in futures]
+
+      for i,r in enumerate(results):
+        b1[i,:,:,:] = r['i0']
+        b2[i,:,:,:] = r['i1']
+        blabels[i] = r['l']
+        p1.append(r['p1'])
+        p2.append(r['p2'])
+        c1.append(r['c1'])
+        c2.append(r['c2'])
+        b3[i,:,:,:] = r['i2']
+        b4[i,:,:,:] = r['i3']
+
+      if augmentation:
+        b1 = augs[0][0].augment_images(b1.astype('uint8')) / 255
+        b2 = augs[1][0].augment_images(b2.astype('uint8')) / 255
+        b3 = augs[2][0].augment_images(b3.astype('uint8')) / 255
+        b4 = augs[3][0].augment_images(b4.astype('uint8')) / 255
+      else:
+        b1 = b1 / 255
+        b2 = b2 / 255
+        b3 = b3 / 255
+        b4 = b4 / 255
+
+      blabels2 = np.array(blabels)
+      blabels = np_utils.to_categorical(blabels2, 2)
+      y = {"class_output":blabels, "reg_output":blabels2}
+      result = [[b1, b2, b3, b4], y]
+
+      if with_paths:
+          result += [[p1,p2]]
+
+      yield result
+
+#------------------------------------------------------------------------------
+def load_img_temporal(img, vec_size, vec_size2, tam):
+  iplt0 = [process_load(img[0][i], vec_size) for i in range(tam)]
+  iplt1 = [process_load(img[2][i], vec_size) for i in range(tam)]
+  iplt2 = [process_load(img[1][i], vec_size2) for i in range(tam)]
+  iplt3 = [process_load(img[3][i], vec_size2) for i in range(tam)]
+
+  d1 = {"i0":iplt0,
+        "i1":iplt1,
+        "i2":iplt2,
+        "i3":iplt3,
+        "l":img[4],
+        "p1":str(img[0]),
+        "p2":str(img[2]),
+        "c1":img[5]['color'],
+        "c2":img[5]['color']
+        }
+
+  d1['metadata'] = []
+  for i in range(tam):
+    diff = abs(np.array(metadata_dict[img[0][i]][:7]) - np.array(metadata_dict[img[2][i]][:7])).tolist()
+    for j in range(len(diff)):
+      diff[j] = 1 if diff[j] else 0
+    d1['metadata'] += metadata_dict[img[0][i]] + metadata_dict[img[2][i]] + diff
+  d1['metadata'] = np.array(d1['metadata'])
+  return d1
+#------------------------------------------------------------------------------
+def generator_temporal(features, batch_size, executor, vec_size, vec_size2, tam, augmentation=False, with_paths=False):
+  N = len(features)
+  indices = np.arange(N)
+  batchInds = get_batch_inds(batch_size, indices, N)
+
+  while True:
+    for inds in batchInds:
+      futures = []
+      _vec_size2 = (len(inds),tam, ) + vec_size
+      b1 = np.zeros(_vec_size)
+      b2 = np.zeros(_vec_size)
+      _vec_size2 = (len(inds),tam, ) + vec_size2
+      b3 = np.zeros(_vec_size2)
+      b4 = np.zeros(_vec_size2)
+
+      blabels = np.zeros((len(inds)))
+      p1 = []
+      p2 = []
+      c1 = []
+      c2 = []
+      metadata = np.zeros((len(inds),metadata_length))
+
+      futures = [executor.submit(partial(load_img_temporal, features[index], vec_size, vec_size2, tam)) for index in inds]
+      results = [future.result() for future in futures]
+
+      for i,r in enumerate(results):
+        for j in range(tam):
+          b1[i,j,:,:,:] = r['i0'][j]
+          b2[i,j,:,:,:] = r['i1'][j]
+          b3[i,j,:,:,:] = r['i2'][j]
+          b4[i,j,:,:,:] = r['i3'][j]
+
+        blabels[i] = r['l']
+        p1.append(r['p1'])
+        p2.append(r['p2'])
+        c1.append(r['c1'])
+        c2.append(r['c2'])
+        metadata[i,:] = r['metadata']
+
+      if augmentation:
+        for j in range(tam):
+          b1[:,j,:] = augs[0][j].augment_images(b1[:,j,:].astype('uint8')) / 255
+          b2[:,j,:] = augs[1][j].augment_images(b2[:,j,:].astype('uint8')) / 255
+          b3[:,j,:] = augs[2][j].augment_images(b3[:,j,:].astype('uint8')) / 255
+          b4[:,j,:] = augs[3][j].augment_images(b4[:,j,:].astype('uint8')) / 255
+      else:
+        for j in range(tam):
+          b1[:,j,:] = b1[:,j,:] / 255
+          b2[:,j,:] = b2[:,j,:] / 255
+          b3[:,j,:] = b3[:,j,:] / 255
+          b4[:,j,:] = b4[:,j,:] / 255
+
+      blabels2 = np.array(blabels)
+      blabels = np_utils.to_categorical(blabels2, 2)
+      y = {"class_output":blabels, "reg_output":blabels2}
+      result = [[b1, b2, b3, b4, metadata], y]
+
+      if with_paths:
+          result += [[p1,p2]]
+
+      yield result

@@ -14,75 +14,13 @@ import pandas as pd
 from custom_layers import *
 from collections import Counter
 from sys import argv
-#------------------------------------------------------------------------------
-def load_img(img, vec_size):
-  iplt0 = process_load(img[0][0], vec_size)
-  iplt1 = process_load(img[2][0], vec_size)
-
-  d1 = {"i0":iplt0,
-        "i1":iplt1,
-        "l":img[4],
-        "p1":img[0][0],
-        "p2":img[2][0],
-        "c1":img[5]['color'],
-        "c2":img[5]['color']
-        }
-
-  return d1
 
 #------------------------------------------------------------------------------
-def generator(features, batch_size, executor, vec_size, augmentation=False, with_paths=False):
-  N = len(features)
-  indices = np.arange(N)
-  batchInds = get_batch_inds(batch_size, indices, N)
-
-  while True:
-    for inds in batchInds:
-      futures = []
-      _vec_size = (len(inds),) + vec_size
-      b1 = np.zeros(_vec_size)
-      b2 = np.zeros(_vec_size)
-
-      blabels = np.zeros((len(inds)))
-      p1 = []
-      p2 = []
-      c1 = []
-      c2 = []
-
-      futures = [executor.submit(partial(load_img, features[index], vec_size)) for index in inds]
-      results = [future.result() for future in futures]
-
-      for i,r in enumerate(results):
-        b1[i,:,:,:] = r['i0']
-        b2[i,:,:,:] = r['i1']
-        blabels[i] = r['l']
-        p1.append(r['p1'])
-        p2.append(r['p2'])
-        c1.append(r['c1'])
-        c2.append(r['c2'])
-
-      if augmentation:
-        b1 = augs[0][0].augment_images(b1.astype('uint8')) / 255
-        b2 = augs[1][0].augment_images(b2.astype('uint8')) / 255
-      else:
-        b1 = b1 / 255
-        b2 = b2 / 255
-
-      blabels2 = np.array(blabels)
-      blabels = np_utils.to_categorical(blabels2, 2)
-      y = {"class_output":blabels, "reg_output":blabels2}
-      result = [[b1, b2,b1, b2], y]
-
-      if with_paths:
-          result += [[p1,p2]]
-
-      yield result
-#------------------------------------------------------------------------------
-def siamese_model(input1):
+def siamese_model(input1, input2):
   left_input_P = Input(input1)
   right_input_P = Input(input1)
-  left_input_C = Input(input1)
-  right_input_C = Input(input1)
+  left_input_C = Input(input2)
+  right_input_C = Input(input2)
   convnet_plate = small_vgg_plate(input1)
   encoded_l_P = convnet_plate(left_input_P)
   encoded_r_P = convnet_plate(right_input_P)
@@ -115,6 +53,7 @@ if __name__ == '__main__':
   keys = ['Set01','Set02','Set03','Set04','Set05']
 
   input1 = (image_size_h_p,image_size_w_p,nchannels)
+  input2 = (image_size_h_c,image_size_w_c,nchannels)
   type1 = argv[1]
 
   if type1=='train':
@@ -135,9 +74,9 @@ if __name__ == '__main__':
       ex2 = ProcessPoolExecutor(max_workers = 4)
       ex3 = ProcessPoolExecutor(max_workers = 4)
 
-      trnGen = generator(trn, batch_size, ex1, input1,  augmentation=True)
-      tstGen = generator(val, batch_size, ex2, input1)
-      siamese_net = siamese_model(input1)
+      trnGen = generator(trn, batch_size, ex1, input1, input2,  augmentation=True)
+      tstGen = generator(val, batch_size, ex2, input1, input2)
+      siamese_net = siamese_model(input1, input2)
       print(siamese_net.summary())
 
       f1 = 'model_plate_%d.h5' % (k)
@@ -150,10 +89,10 @@ if __name__ == '__main__':
                                     validation_steps=val_steps_per_epoch)
 
       #validate plate model
-      tstGen2 = generator(val, batch_size, ex3, input1, with_paths = True)
+      tstGen2 = generator(val, batch_size, ex3, input1, input2, with_paths = True)
       test_report('validation_plate_%d' % (k),siamese_net, val_steps_per_epoch, tstGen2)
       del tstGen2
-      tstGen2 = generator(tst, batch_size, ex3, input1, with_paths = True)
+      tstGen2 = generator(tst, batch_size, ex3, input1, input2, with_paths = True)
       test_report('test_plate_%d' % (k),siamese_net, tst_steps_per_epoch, tstGen2)
 
       siamese_net.save(f1)
@@ -162,8 +101,10 @@ if __name__ == '__main__':
     data = json.load(open(argv[2]))
     img1 = (process_load(data['img1'], input1)/255.0).reshape(1,input1[0], input1[1],input1[2])
     img2 = (process_load(data['img2'], input1)/255.0).reshape(1,input1[0], input1[1],input1[2])
+    img3 = np.zeros(input2)
+    img4 = np.zeros(input2)
 
-    X = [img1, img2, img1, img2]
+    X = [img1, img2, img3, img4]
 
     for f1 in argv[3:]:
       model = load_model(f1)

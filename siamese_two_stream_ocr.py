@@ -17,77 +17,6 @@ from collections import Counter
 
 metadata_dict = {}
 
-#------------------------------------------------------------------------------
-def load_img(img, vec_size2):
-  iplt2 = process_load(img[1][0], vec_size2)
-  iplt3 = process_load(img[3][0], vec_size2)
-
-  d1 = {"i2":iplt2,
-        "i3":iplt3,
-        "l":img[4],
-        "p1":img[0][0],
-        "p2":img[2][0],
-        "c1":img[5]['color'],
-        "c2":img[5]['color']
-        }
-
-  diff = abs(np.array(metadata_dict[img[0][0]][:7]) - np.array(metadata_dict[img[2][0]][:7])).tolist()
-  for i in range(len(diff)):
-    diff[i] = 1 if diff[i] else 0
-  d1['metadata'] = np.array(metadata_dict[img[0][0]] + metadata_dict[img[2][0]] + diff)
-
-  return d1
-
-#------------------------------------------------------------------------------
-def generator(features, batch_size, executor, vec_size2, augmentation=False, with_paths=False):
-  N = len(features)
-  indices = np.arange(N)
-  batchInds = get_batch_inds(batch_size, indices, N)
-
-  while True:
-    for inds in batchInds:
-      futures = []
-      _vec_size2 = (len(inds),) + vec_size2
-      b3 = np.zeros(_vec_size2)
-      b4 = np.zeros(_vec_size2)
-
-      blabels = np.zeros((len(inds)))
-      p1 = []
-      p2 = []
-      c1 = []
-      c2 = []
-      metadata = np.zeros((len(inds),metadata_length))
-
-      futures = [executor.submit(partial(load_img, features[index], vec_size2)) for index in inds]
-      results = [future.result() for future in futures]
-
-      for i,r in enumerate(results):
-        blabels[i] = r['l']
-        p1.append(r['p1'])
-        p2.append(r['p2'])
-        c1.append(r['c1'])
-        c2.append(r['c2'])
-        b3[i,:,:,:] = r['i2']
-        b4[i,:,:,:] = r['i3']
-        metadata[i,:] = r['metadata']
-
-      if augmentation:
-        b3 = augs[2][0].augment_images(b3.astype('uint8')) / 255
-        b4 = augs[3][0].augment_images(b4.astype('uint8')) / 255
-      else:
-        b3 = b3 / 255
-        b4 = b4 / 255
-
-      blabels2 = np.array(blabels)
-      blabels = np_utils.to_categorical(blabels2, 2)
-      y = {"class_output":blabels, "reg_output":blabels2}
-      result = [[b3, b4, b3, b4, metadata], y]
-
-      if with_paths:
-          result += [[p1,p2]]
-
-      yield result
-#------------------------------------------------------------------------------
 def read_metadata(labels):
   global metadata_dict
   data = pd.read_csv(ocr_file, sep=' ')
@@ -121,9 +50,9 @@ def read_metadata(labels):
   return metadata_dict
 
 #------------------------------------------------------------------------------
-def siamese_model(input2):
-  left_input_P = Input(input2)
-  right_input_P = Input(input2)
+def siamese_model(input1, input2):
+  left_input_P = Input(input1)
+  right_input_P = Input(input1)
   left_input_C = Input(input2)
   right_input_C = Input(input2)
   auxiliary_input = Input(shape=(metadata_length,), name='aux_input')
@@ -166,6 +95,7 @@ if __name__ == '__main__':
   labels = list(set(labels))
   read_metadata(labels)
 
+  input1 = (image_size_h_p,image_size_w_p,nchannels)
   input2 = (image_size_h_c,image_size_w_c,nchannels)
   type1 = argv[1]
 
@@ -187,9 +117,9 @@ if __name__ == '__main__':
       ex2 = ProcessPoolExecutor(max_workers = 4)
       ex3 = ProcessPoolExecutor(max_workers = 4)
 
-      trnGen = generator(trn, batch_size, ex1, input2, augmentation=True)
-      tstGen = generator(val, batch_size, ex2, input2)
-      siamese_net = siamese_model(input2)
+      trnGen = generator(trn, batch_size, ex1, input1, input2, augmentation=True)
+      tstGen = generator(val, batch_size, ex2, input1, input2)
+      siamese_net = siamese_model(input1, input2)
       print(siamese_net.summary())
 
       f1 = 'model_two_stream_ocr_%d.h5' % (k)
@@ -202,10 +132,10 @@ if __name__ == '__main__':
                                     validation_steps=val_steps_per_epoch)
 
       #validate plate model
-      tstGen2 = generator(val, batch_size, ex3, input2, with_paths = True)
+      tstGen2 = generator(val, batch_size, ex3, input1, input2, with_paths = True)
       test_report('validation_two_stream_ocr_%d' % (k),siamese_net, val_steps_per_epoch, tstGen2)
       del tstGen2
-      tstGen2 = generator(tst, batch_size, ex3, input2, with_paths = True)
+      tstGen2 = generator(tst, batch_size, ex3, input1, input2, with_paths = True)
       test_report('test_two_stream_ocr_%d' % (k),siamese_net, tst_steps_per_epoch, tstGen2)
 
       siamese_net.save(f1)
@@ -213,9 +143,10 @@ if __name__ == '__main__':
     results = []
     data = json.load(open(argv[2]))
     alpha_dict = {i.upper():j/35 for j,i in enumerate(string.ascii_uppercase + string.digits)}
-
-    img1 = (process_load(data['img1'], input2)/255.0).reshape(1, input2[0], input2[1], input2[2])
-    img2 = (process_load(data['img2'], input2)/255.0).reshape(1, input2[0], input2[1], input2[2])
+    img1 = np.zeros(input1)
+    img2 = np.zeros(input1)
+    img3 = (process_load(data['img1'], input2)/255.0).reshape(1, input2[0], input2[1], input2[2])
+    img4 = (process_load(data['img2'], input2)/255.0).reshape(1, input2[0], input2[1], input2[2])
 
     aux1 = []
     for str1 in data['ocr1']:
@@ -234,7 +165,7 @@ if __name__ == '__main__':
       diff[j] = 1 if diff[j] else 0
     metadata = aux1 + aux2 + diff
 
-    X = [img1, img2, img1, img2, metadata]
+    X = [img1, img2, img3, img4, metadata]
 
     for f1 in argv[3:]:
       model = load_model(f1)

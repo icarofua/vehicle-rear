@@ -21,83 +21,6 @@ metadata_length = metadata_length*tam
 
 
 #------------------------------------------------------------------------------
-def load_img(img, vec_size2):
-  iplt2 = [process_load(img[1][i], vec_size2) for i in range(tam)]
-  iplt3 = [process_load(img[3][i], vec_size2) for i in range(tam)]
-  d1 = {"i0":None,
-        "i1":None,
-        "i2":iplt2,
-        "i3":iplt3,
-        "l":img[4],
-        "p1":str(img[0]),
-        "p2":str(img[2]),
-        "c1":img[5]['color'],
-        "c2":img[5]['color']
-        }
-
-  d1['metadata'] = []
-  for i in range(tam):
-    diff = abs(np.array(metadata_dict[img[0][i]][:7]) - np.array(metadata_dict[img[2][i]][:7])).tolist()
-    for j in range(len(diff)):
-      diff[j] = 1 if diff[j] else 0
-    d1['metadata'] += metadata_dict[img[0][i]] + metadata_dict[img[2][i]] + diff
-  d1['metadata'] = np.array(d1['metadata'])
-  return d1
-#------------------------------------------------------------------------------
-def generator(features, batch_size, executor, vec_size2, augmentation=False, with_paths=False):
-  N = len(features)
-  indices = np.arange(N)
-  batchInds = get_batch_inds(batch_size, indices, N)
-
-  while True:
-    for inds in batchInds:
-      futures = []
-      _vec_size2 = (len(inds),tam, ) + vec_size2
-      b3 = np.zeros(_vec_size2)
-      b4 = np.zeros(_vec_size2)
-
-      blabels = np.zeros((len(inds)))
-      p1 = []
-      p2 = []
-      c1 = []
-      c2 = []
-      metadata = np.zeros((len(inds),metadata_length))
-
-      futures = [executor.submit(partial(load_img, features[index], vec_size2)) for index in inds]
-      results = [future.result() for future in futures]
-
-      for i,r in enumerate(results):
-        for j in range(tam):
-          b3[i,j,:,:,:] = r['i2'][j]
-          b4[i,j,:,:,:] = r['i3'][j]
-
-        blabels[i] = r['l']
-        p1.append(r['p1'])
-        p2.append(r['p2'])
-        c1.append(r['c1'])
-        c2.append(r['c2'])
-        metadata[i,:] = r['metadata']
-
-      if augmentation:
-        for j in range(tam):
-          b3[:,j,:] = augs[2][j].augment_images(b3[:,j,:].astype('uint8')) / 255
-          b4[:,j,:] = augs[3][j].augment_images(b4[:,j,:].astype('uint8')) / 255
-      else:
-        for j in range(tam):
-          b3[:,j,:] = b3[:,j,:] / 255
-          b4[:,j,:] = b4[:,j,:] / 255
-
-      blabels2 = np.array(blabels)
-      blabels = np_utils.to_categorical(blabels2, 2)
-      y = {"class_output":blabels, "reg_output":blabels2}
-      result = [[b3, b4, b3, b4, metadata], y]
-
-      if with_paths:
-          result += [[p1,p2]]
-
-      yield result
-
-#------------------------------------------------------------------------------
 def read_metadata(labels):
   global metadata_dict
   data = pd.read_csv(ocr_file, sep=' ')
@@ -175,8 +98,10 @@ if __name__ == '__main__':
   labels = list(set(labels))
   read_metadata(labels)
 
+  input1 = (image_size_h_p,image_size_w_p,nchannels)
   input2 = (image_size_h_c,image_size_w_c,nchannels)
-  input_temporal = (tam,image_size_h_c,image_size_w_c,nchannels)
+  input_temporal1 = (tam,image_size_h_p,image_size_w_p,nchannels)
+  input_temporal2 = (tam,image_size_h_c,image_size_w_c,nchannels)
   type1 = argv[1]
 
   if type1=='train':
@@ -196,9 +121,9 @@ if __name__ == '__main__':
       ex2 = ProcessPoolExecutor(max_workers = 4)
       ex3 = ProcessPoolExecutor(max_workers = 4)
 
-      trnGen = generator(trn, batch_size, ex1, input2, augmentation=True)
-      tstGen = generator(val, batch_size, ex2, input2)
-      siamese_net = siamese_model(input_temporal)
+      trnGen = generator_temporal(trn, batch_size, ex1, input1, input2, tam, augmentation=True)
+      tstGen = generator_temporal(val, batch_size, ex2, input1, input2, tam)
+      siamese_net = siamese_model(input_temporal1, input_temporal2)
       print(siamese_net.summary())
 
       f1 = 'model_temporal2_%d.h5' % (k)
@@ -211,10 +136,10 @@ if __name__ == '__main__':
                                     validation_steps=val_steps_per_epoch)
 
       #validate plate model
-      tstGen2 = generator(val, batch_size, ex3, input2, with_paths = True)
+      tstGen2 = generator(val, batch_size, ex3, input1, input2, tam, with_paths = True)
       test_report('validation_temporal2_%d' % (k),siamese_net, val_steps_per_epoch, tstGen2)
       del tstGen2
-      tstGen2 = generator(tst, batch_size, ex3, input2, with_paths = True)
+      tstGen2 = generator(tst, batch_size, ex3, input1, input2, tam, with_paths = True)
       test_report('test_temporal2_%d' % (k),siamese_net, tst_steps_per_epoch, tstGen2)
 
       siamese_net.save(f1)
@@ -223,8 +148,11 @@ if __name__ == '__main__':
     data = json.load(open(argv[2]))
     alpha_dict = {i.upper():j/35 for j,i in enumerate(string.ascii_uppercase + string.digits)}
 
-    img1 = np.array([process_load(path1, input2)/255.0 for path1 in data['img1']]).reshape(tam,image_size_h_c,image_size_w_c,-1)
-    img2 = np.array([process_load(path1, input2)/255.0 for path1 in data['img2']]).reshape(tam,image_size_h_c,image_size_w_c,-1)
+    img1 = np.zeros(input_temporal1)
+    img2 = np.zeros(input_temporal1)
+    img3 = np.array([process_load(path1, input2)/255.0 for path1 in data['img1']]).reshape(tam,image_size_h_c,image_size_w_c,-1)
+    img4 = np.array([process_load(path1, input2)/255.0 for path1 in data['img2']]).reshape(tam,image_size_h_c,image_size_w_c,-1)
+
     metadata = []
     for i in range(tam):
       aux1 = []
@@ -245,7 +173,7 @@ if __name__ == '__main__':
       metadata += aux1 + aux2 + diff
     metadata = np.array(metadata)
 
-    X = [img1, img2, img1, img2, metadata]
+    X = [img1, img2, img3, img4, metadata]
 
     for f1 in argv[3:]:
       model = load_model(f1)

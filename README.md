@@ -169,7 +169,7 @@ Example of test.json:
   "probs2":[[0.0,0.5,0.4,0.3,1.0,0.2,0.1], [1.0,0.4,0.3,0.5,1.0,0.8,0.9],[1.0,0.4,0.3,0.5,1.0,0.8,0.9]]
 }
 
-## 4.8 OCR model
+### 4.8 OCR model
 
 In the OCR folder under models (models.tgz), you must first run "make" in the "darknet" folder 
 to compile Darknet and then run "python3 cnn-ocr.py" in the same folder to run the CNN-OCR 

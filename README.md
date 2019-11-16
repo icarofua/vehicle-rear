@@ -57,6 +57,8 @@ from config import *
 to
 from config_1 import *
 
+For example, you can see in the siamese_shape_stream1.py.
+
 ## 3 Training the algorithms
 
 ### 3.1 siamese plate
@@ -87,87 +89,25 @@ python siamese_temporal3.py train
 ### 4.1 siamese plate
 python siamese_plate_stream.py test test_plate.json
 
-Example of test.json:
-{
-  "img1":path1,
-  "img2":path2
-}
-
 ### 4.2 siamese shape
 You can test the siamese shape with the following algorithms: resnet50, resnet6, resnet8, mccnn, vgg16, googlenet, lenet5, matchnet or smallvgg.
 
 Example: python siamese_shape_stream.py test smallvgg test_shape.json
 
-Example of test.json:
-{
-  "img1":path1,
-  "img2":path2
-}
-
 ### 4.3 siamese two stream (plate + shape)
 python siamese_two_stream.py test test_two.json
-
-Example of test.json:
-{
-  "img1_shape":path1,
-  "img2_shape":path2,
-  "img1_plate":path3,
-  "img2_plate":path4,
-}
 
 ### 4.4 siamese three stream (plate + shape + ocr)
 python siamese_three_stream.py test test_three.json
 
-Example of test.json:
-{
-  "img1_shape":path1,
-  "img2_shape":path2,
-  "img1_plate":path3,
-  "img2_plate":path4,
-  "ocr1":aaa-1234,
-  "ocr2":abc-1234,
-  "probs1":[0.0,0.5,0.4,0.3,1.0,0.2,0.1],
-  "probs2":[1.0,0.4,0.3,0.5,1.0,0.8,0.9]
-}
-
 ### 4.5 siamese two stream (ocr + shape)
 python siamese_two_stream_ocr.py test test_two_ocr.json
-
-Example of test.json:
-{
-  "img1":path1,
-  "img2":path2,
-  "ocr1":aaa-1234,
-  "ocr2":abc-1234,
-  "probs1":[0.0,0.5,0.4,0.3,1.0,0.2,0.1],
-  "probs2":[1.0,0.4,0.3,0.5,1.0,0.8,0.9]
-}
 
 ### 4.6 siamese temporal stream with 2 images (ocr + shape)
 python siamese_temporal2.py test test_temporal2.json
 
-Example of test.json:
-{
-  "img1":[path1, path2],
-  "img2":[path3, path4],
-  "ocr1":[aaa-1234,abc-1234],
-  "ocr2":[caa-1234,bbc-1234],
-  "probs1":[[0.0,0.5,0.4,0.3,1.0,0.2,0.1], [1.0,0.4,0.3,0.5,1.0,0.8,0.9]],
-  "probs2":[[0.0,0.5,0.4,0.3,1.0,0.2,0.1], [1.0,0.4,0.3,0.5,1.0,0.8,0.9]]
-}
-
 ### 4.7 siamese temporal stream with 3 images (ocr + shape)
 python siamese_temporal3.py test test_temporal3.json
-
-Example of test.json:
-{
-  "img1":[path1, path2, path3],
-  "img2":[path4, path5, path6],
-  "ocr1":[aaa-1234,abc-1234,ddd-2222],
-  "ocr2":[caa-1234,bbc-1234,ccc-4321],
-  "probs1":[[0.0,0.5,0.4,0.3,1.0,0.2,0.1], [1.0,0.4,0.3,0.5,1.0,0.8,0.9],[1.0,0.4,0.3,0.5,1.0,0.8,0.9]],
-  "probs2":[[0.0,0.5,0.4,0.3,1.0,0.2,0.1], [1.0,0.4,0.3,0.5,1.0,0.8,0.9],[1.0,0.4,0.3,0.5,1.0,0.8,0.9]]
-}
 
 ### 4.8 OCR model
 

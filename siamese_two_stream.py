@@ -102,16 +102,19 @@ if __name__ == '__main__':
     results = []
     data = json.load(open(argv[2]))
 
-    img1 = process_load(data['img1_plate'], input1)/255.0
-    img2 = process_load(data['img2_plate'], input1)/255.0
-    img3 = process_load(data['img1_shape'], input2)/255.0
-    img4 = process_load(data['img2_shape'], input2)/255.0
+    img1 = (process_load(data['img1_plate'], input1)/255.0).reshape(1,input1[0],input1[1],input1[2])
+    img2 = (process_load(data['img2_plate'], input1)/255.0).reshape(1,input1[0],input1[1],input1[2])
+    img3 = (process_load(data['img1_shape'], input2)/255.0).reshape(1,input2[0],input2[1],input2[2])
+    img4 = (process_load(data['img2_shape'], input2)/255.0).reshape(1,input2[0],input2[1],input2[2])
 
     X = [img1, img2, img3, img4]
 
+    k = 0
     for f1 in argv[3:]:
       model = load_model(f1)
       Y_ = model.predict(X)
       results.append(np.argmax(Y_[0]))
-      print("model %d: %s",k+1,"positive" if results[k]==POS else "negative")
-    print("final result: %s","positive" if Counter(results).most_common(1)==POS else "negative")
+      print("model %d: %s" % (k+1,"positive" if results[k]==POS else "negative"))
+      k+=1
+    print("final result: %s" % ("positive" if Counter(results).most_common(1)[0][0]==POS else "negative"))
+

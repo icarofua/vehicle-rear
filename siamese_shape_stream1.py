@@ -87,8 +87,10 @@ if __name__ == '__main__':
     batch_size = 32
   elif name == 'smallvgg':
     model = small_vgg_car
+
   input1 = (image_size_h_p,image_size_w_p,nchannels)
   input2 = (image_size_h_c,image_size_w_c,nchannels)
+
   if type1 == 'train':
     for k in range(len(keys)):
       K.clear_session()
@@ -129,17 +131,17 @@ if __name__ == '__main__':
       siamese_net.save(f1)
   elif type1 == 'test':
     results = []
-    data = json.load(open(argv[2]))
-    img1 = np.zeros(input1)
-    img2 = np.zeros(input1)
+    data = json.load(open(argv[3]))
     img3 = (process_load(data['img1'], input2)/255).reshape(1,input2[0], input2[1],input2[2])
     img4 = (process_load(data['img2'], input2)/255).reshape(1,input2[0], input2[1],input2[2])
 
-    X = [img1, img2,img3, img4]
+    X = [img3, img4]
 
-    for f1 in argv[3:]:
+    k = 0
+    for f1 in argv[4:]:
       model = load_model(f1)
       Y_ = model.predict(X)
       results.append(np.argmax(Y_[0]))
-      print("model: %s" % ("positive" if results[-1]==POS else "negative"))
+      print("model %d: %s" % (k+1,"positive" if results[k]==POS else "negative"))
+      k+=1
     print("final result: %s" % ("positive" if Counter(results).most_common(1)[0][0]==POS else "negative"))

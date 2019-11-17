@@ -101,14 +101,13 @@ if __name__ == '__main__':
     data = json.load(open(argv[2]))
     img1 = (process_load(data['img1'], input1)/255.0).reshape(1,input1[0], input1[1],input1[2])
     img2 = (process_load(data['img2'], input1)/255.0).reshape(1,input1[0], input1[1],input1[2])
-    img3 = np.zeros(input2)
-    img4 = np.zeros(input2)
 
-    X = [img1, img2, img3, img4]
-
+    X = [img1, img2]
+    k = 0
     for f1 in argv[3:]:
       model = load_model(f1)
       Y_ = model.predict(X)
       results.append(np.argmax(Y_[0]))
-      print("model: %s" % ("positive" if results[-1]==POS else "negative"))
+      print("model %d: %s" % (k+1,"positive" if results[k]==POS else "negative"))
+      k+=1
     print("final result: %s" % ("positive" if Counter(results).most_common(1)[0][0]==POS else "negative"))

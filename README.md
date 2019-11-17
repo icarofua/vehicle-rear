@@ -87,27 +87,27 @@ python siamese_temporal3.py train
 ## 4 Testing the algorithms
 
 ### 4.1 siamese plate
-python siamese_plate_stream.py test test_plate.json
+python siamese_plate_stream.py test test_plate.json  models*.h5
 
 ### 4.2 siamese shape
 You can test the siamese shape with the following algorithms: resnet50, resnet6, resnet8, mccnn, vgg16, googlenet, lenet5, matchnet or smallvgg.
 
-Example: python siamese_shape_stream.py test smallvgg test_shape.json
+Example: python siamese_shape_stream.py test smallvgg test_shape.json models*.h5
 
 ### 4.3 siamese two stream (plate + shape)
-python siamese_two_stream.py test test_two.json
+python siamese_two_stream.py test test_two.json  models*.h5
 
 ### 4.4 siamese three stream (plate + shape + ocr)
-python siamese_three_stream.py test test_three.json
+python siamese_three_stream.py test test_three.json  models*.h5
 
 ### 4.5 siamese two stream (ocr + shape)
-python siamese_two_stream_ocr.py test test_two_ocr.json
+python siamese_two_stream_ocr.py test test_two_ocr.json  models*.h5
 
 ### 4.6 siamese temporal stream with 2 images (ocr + shape)
-python siamese_temporal2.py test test_temporal2.json
+python siamese_temporal2.py test test_temporal2.json  models*.h5
 
 ### 4.7 siamese temporal stream with 3 images (ocr + shape)
-python siamese_temporal3.py test test_temporal3.json
+python siamese_temporal3.py test test_temporal3.json  models*.h5
 
 ### 4.8 OCR model
 

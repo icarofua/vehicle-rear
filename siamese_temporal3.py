@@ -152,10 +152,8 @@ if __name__ == '__main__':
     data = json.load(open(argv[2]))
     alpha_dict = {i.upper():j/35 for j,i in enumerate(string.ascii_uppercase + string.digits)}
 
-    img1 = np.zeros(input_temporal1)
-    img2 = np.zeros(input_temporal1)
-    img3 = np.array([process_load(path1, input2)/255.0 for path1 in data['img1']]).reshape(tam,image_size_h_c,image_size_w_c,-1)
-    img4 = np.array([process_load(path1, input2)/255.0 for path1 in data['img2']]).reshape(tam,image_size_h_c,image_size_w_c,-1)
+    img3 = np.array([process_load(path1, input2)/255.0 for path1 in data['img1']]).reshape(1,tam,image_size_h_c,image_size_w_c,-1)
+    img4 = np.array([process_load(path1, input2)/255.0 for path1 in data['img2']]).reshape(1,tam,image_size_h_c,image_size_w_c,-1)
 
     metadata = []
     for i in range(tam):
@@ -175,13 +173,15 @@ if __name__ == '__main__':
       for j in range(len(diff)):
         diff[j] = 1 if diff[j] else 0
       metadata += aux1 + aux2 + diff
-    metadata = np.array(metadata)
+    metadata = np.array(metadata).reshape(1,-1)
 
-    X = [img1, img2, img3, img4, metadata]
+    X = [img3, img4, metadata]
 
+    k = 0
     for f1 in argv[3:]:
       model = load_model(f1)
       Y_ = model.predict(X)
       results.append(np.argmax(Y_[0]))
-      print("model %d: %s",k+1,"positive" if results[k]==POS else "negative")
-    print("final result: %s","positive" if Counter(results).most_common(1)==POS else "negative")
+      print("model %d: %s" % (k+1,"positive" if results[k]==POS else "negative"))
+      k+=1
+    print("final result: %s" % ("positive" if Counter(results).most_common(1)[0][0]==POS else "negative"))

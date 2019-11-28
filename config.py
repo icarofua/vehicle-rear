@@ -23,13 +23,14 @@ image_size_h_p = 48 #image´s height for registration plate
 image_size_w_c = 64 #image´s width for vehicle´s shape
 image_size_h_c = 64 #image´s height for vehicle´s shape
 
-folder_cross1 = 'dataset2/Camera1'
-folder_cross2 = 'dataset2/Camera2'
+path = 'data'
+folder_cross1 = '%s/dataset2/Camera1' % (path)
+folder_cross2 = '%s/dataset2/Camera2' % (path)
 plt_name="classes"
 car_name="classes_carros"
 plt_folder="*/classes"
 car_folder="*/classes_carros"
-ocr_file = 'ocr/0p.txt'
+ocr_file = 'data/ocr/0p.txt'
 metadata_length = 35
 tam_max = 3
 L1_layer = Lambda(lambda tensor:K.abs(tensor[0] - tensor[1]))

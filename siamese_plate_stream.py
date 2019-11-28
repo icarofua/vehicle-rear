@@ -48,7 +48,7 @@ def siamese_model(input1, input2):
   return model
 #------------------------------------------------------------------------------
 if __name__ == '__main__':
-  data = json.load(open('dataset_1.json'))
+  data = json.load(open('%s/dataset_1.json' % (path)))
 
   keys = ['Set01','Set02','Set03','Set04','Set05']
 

@@ -59,6 +59,8 @@ from config_1 import *
 
 For example, you can see in the siamese_shape_stream1.py.
 
+OBS: If you don't decompress the data.tgz in the vehicle-ReId folder, change the parameter path in config.py and config1.py with new path of data.
+
 ## 3 Training the algorithms
 
 ### 3.1 siamese plate

@@ -84,7 +84,7 @@ if __name__ == '__main__':
     model = GoogLeNet
     image_size_h_c = 112
     image_size_w_c = 112
-    batch_size = 32
+    batch_size = 16
   elif name == 'smallvgg':
     model = small_vgg_car
 

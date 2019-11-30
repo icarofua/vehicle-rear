@@ -4,7 +4,7 @@ import numpy as np
 from keras.preprocessing import image
 from concurrent.futures import ProcessPoolExecutor
 from functools import partial
-from config_1 import *
+from config import *
 from math import ceil
 import json
 from sklearn import metrics
@@ -58,9 +58,9 @@ def read_metadata(labels):
   return metadata_dict
 
 #------------------------------------------------------------------------------
-def siamese_model(input2):
-  left_input_P = Input(input2)
-  right_input_P = Input(input2)
+def siamese_model(input1, input2):
+  left_input_P = Input(input1)
+  right_input_P = Input(input1)
   left_input_C = Input(input2)
   right_input_C = Input(input2)
   auxiliary_input = Input(shape=(metadata_length,), name='aux_input')
@@ -125,8 +125,8 @@ if __name__ == '__main__':
       ex2 = ProcessPoolExecutor(max_workers = 4)
       ex3 = ProcessPoolExecutor(max_workers = 4)
 
-      trnGen = generator_temporal(trn, batch_size, ex1, input1, input2, tam, augmentation=True)
-      tstGen = generator_temporal(val, batch_size, ex2, input1, input2, tam)
+      trnGen = generator_temporal(trn, batch_size, ex1, input1, input2, tam, metadata_dict,metadata_length, augmentation=True)
+      tstGen = generator_temporal(val, batch_size, ex2, input1, input2, tam, metadata_dict,metadata_length)
       siamese_net = siamese_model(input_temporal1, input_temporal2)
       print(siamese_net.summary())
 
@@ -140,10 +140,10 @@ if __name__ == '__main__':
                                     validation_steps=val_steps_per_epoch)
 
       #validate plate model
-      tstGen2 = generator(val, batch_size, ex3, input1, input2, tam, with_paths = True)
+      tstGen2 = generator_temporal(val, batch_size, ex3, input1, input2, tam, metadata_dict,metadata_length, with_paths = True)
       test_report('validation_temporal3_%d' % (k),siamese_net, val_steps_per_epoch, tstGen2)
       del tstGen2
-      tstGen2 = generator(tst, batch_size, ex3, input1, input2, tam, with_paths = True)
+      tstGen2 = generator_temporal(tst, batch_size, ex3, input1, input2, tam, metadata_dict,metadata_length, with_paths = True)
       test_report('test_temporal3_%d' % (k),siamese_net, tst_steps_per_epoch, tstGen2)
 
       siamese_net.save(f1)

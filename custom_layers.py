@@ -488,7 +488,7 @@ def process_load(f1, vec_size):
     return _i1
 
 #------------------------------------------------------------------------------
-def load_img(img, vec_size, vec_size2, use_metadata=False):
+def load_img(img, vec_size, vec_size2, metadata_dict):
   iplt0 = process_load(img[0][0], vec_size)
   iplt1 = process_load(img[2][0], vec_size)
   iplt2 = process_load(img[1][0], vec_size2)
@@ -504,7 +504,7 @@ def load_img(img, vec_size, vec_size2, use_metadata=False):
         "c1":img[5]['color'],
         "c2":img[5]['color']
         }
-  if use_metadata:
+  if metadata_dict is not None:
     diff = abs(np.array(metadata_dict[img[0][0]][:7]) - np.array(metadata_dict[img[2][0]][:7])).tolist()
     for i in range(len(diff)):
       diff[i] = 1 if diff[i] else 0
@@ -513,7 +513,7 @@ def load_img(img, vec_size, vec_size2, use_metadata=False):
   return d1
 
 #------------------------------------------------------------------------------
-def generator(features, batch_size, executor, vec_size, vec_size2, augmentation=False, with_paths=False):
+def generator(features, batch_size, executor, vec_size, vec_size2, metadata_dict=None, metadata_length=0, augmentation=False, with_paths=False):
   N = len(features)
   indices = np.arange(N)
   batchInds = get_batch_inds(batch_size, indices, N)
@@ -533,8 +533,10 @@ def generator(features, batch_size, executor, vec_size, vec_size2, augmentation=
       p2 = []
       c1 = []
       c2 = []
+      if metadata_length>0:
+        metadata = np.zeros((len(inds),metadata_length))
 
-      futures = [executor.submit(partial(load_img, features[index], vec_size, vec_size2)) for index in inds]
+      futures = [executor.submit(partial(load_img, features[index], vec_size, vec_size2, metadata_dict)) for index in inds]
       results = [future.result() for future in futures]
 
       for i,r in enumerate(results):
@@ -547,6 +549,8 @@ def generator(features, batch_size, executor, vec_size, vec_size2, augmentation=
         c2.append(r['c2'])
         b3[i,:,:,:] = r['i2']
         b4[i,:,:,:] = r['i3']
+        if metadata_length>0:
+          metadata[i,:] = r['metadata']
 
       if augmentation:
         b1 = augs[0][0].augment_images(b1.astype('uint8')) / 255
@@ -563,14 +567,16 @@ def generator(features, batch_size, executor, vec_size, vec_size2, augmentation=
       blabels = np_utils.to_categorical(blabels2, 2)
       y = {"class_output":blabels, "reg_output":blabels2}
       result = [[b1, b2, b3, b4], y]
-
+      if metadata_length>0:
+        result[0].append(metadata)
       if with_paths:
           result += [[p1,p2]]
 
       yield result
 
 #------------------------------------------------------------------------------
-def load_img_temporal(img, vec_size, vec_size2, tam):
+
+def load_img_temporal(img, vec_size, vec_size2, tam, metadata_dict):
   iplt0 = [process_load(img[0][i], vec_size) for i in range(tam)]
   iplt1 = [process_load(img[2][i], vec_size) for i in range(tam)]
   iplt2 = [process_load(img[1][i], vec_size2) for i in range(tam)]
@@ -596,7 +602,7 @@ def load_img_temporal(img, vec_size, vec_size2, tam):
   d1['metadata'] = np.array(d1['metadata'])
   return d1
 #------------------------------------------------------------------------------
-def generator_temporal(features, batch_size, executor, vec_size, vec_size2, tam, augmentation=False, with_paths=False):
+def generator_temporal(features, batch_size, executor, vec_size, vec_size2, tam, metadata_dict, metadata_length, augmentation=False, with_paths=False):
   N = len(features)
   indices = np.arange(N)
   batchInds = get_batch_inds(batch_size, indices, N)
@@ -604,7 +610,7 @@ def generator_temporal(features, batch_size, executor, vec_size, vec_size2, tam,
   while True:
     for inds in batchInds:
       futures = []
-      _vec_size2 = (len(inds),tam, ) + vec_size
+      _vec_size = (len(inds),tam, ) + vec_size
       b1 = np.zeros(_vec_size)
       b2 = np.zeros(_vec_size)
       _vec_size2 = (len(inds),tam, ) + vec_size2
@@ -618,7 +624,7 @@ def generator_temporal(features, batch_size, executor, vec_size, vec_size2, tam,
       c2 = []
       metadata = np.zeros((len(inds),metadata_length))
 
-      futures = [executor.submit(partial(load_img_temporal, features[index], vec_size, vec_size2, tam)) for index in inds]
+      futures = [executor.submit(partial(load_img_temporal, features[index], vec_size, vec_size2, tam, metadata_dict)) for index in inds]
       results = [future.result() for future in futures]
 
       for i,r in enumerate(results):

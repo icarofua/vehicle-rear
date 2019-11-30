@@ -84,7 +84,7 @@ def siamese_model(input1, input2):
   return model
 #------------------------------------------------------------------------------
 if __name__ == '__main__':
-  data = json.load(open('dataset_1.json'))
+  data = json.load(open('%s/dataset_1.json' % (path)))
 
   keys = ['Set01','Set02','Set03','Set04','Set05']
 
@@ -117,8 +117,8 @@ if __name__ == '__main__':
       ex2 = ProcessPoolExecutor(max_workers = 4)
       ex3 = ProcessPoolExecutor(max_workers = 4)
 
-      trnGen = generator(trn, batch_size, ex1, input1, input2, augmentation=True)
-      tstGen = generator(val, batch_size, ex2, input1, input2)
+      trnGen = generator(trn, batch_size, ex1, input1, input2, metadata_dict,metadata_length=metadata_length, augmentation=True)
+      tstGen = generator(val, batch_size, ex2, input1, input2, metadata_dict,metadata_length=metadata_length)
       siamese_net = siamese_model(input1, input2)
       print(siamese_net.summary())
 
@@ -132,10 +132,10 @@ if __name__ == '__main__':
                                     validation_steps=val_steps_per_epoch)
 
       #validate plate model
-      tstGen2 = generator(val, batch_size, ex3, input1, input2, with_paths = True)
+      tstGen2 = generator(val, batch_size, ex3, input1, input2, metadata_dict,metadata_length=metadata_length, with_paths = True)
       test_report('validation_two_stream_ocr_%d' % (k),siamese_net, val_steps_per_epoch, tstGen2)
       del tstGen2
-      tstGen2 = generator(tst, batch_size, ex3, input1, input2, with_paths = True)
+      tstGen2 = generator(tst, batch_size, ex3, input1, input2, metadata_dict,metadata_length=metadata_length, with_paths = True)
       test_report('test_two_stream_ocr_%d' % (k),siamese_net, tst_steps_per_epoch, tstGen2)
 
       siamese_net.save(f1)

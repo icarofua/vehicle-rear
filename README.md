@@ -62,7 +62,7 @@ For example, you can see in the siamese_shape_stream1.py.
 OBS: If you don't decompress the data.tgz in the vehicle-ReId folder, change the parameter path in config.py and config1.py with new path of data.
 
 ## 3 Training the algorithms
-In this process, the data are loaded from the json file generated for the step 5, and it is runned the process of training and validation.
+In this process, the data are loaded from the json file generated for the step 6, and it is runned the process of training and validation.
 
 ### 3.1 siamese plate
 python siamese_plate_stream.py train
@@ -88,7 +88,7 @@ python siamese_temporal2.py train
 python siamese_temporal3.py train
 
 ## 4 Testing the algorithms
-In this process, the data are loaded from the json file generated for the step 5.
+In this process, the data are loaded from the json file generated for the step 6.
 
 ### 4.1 siamese plate
 python siamese_plate_stream.py test models/Plate

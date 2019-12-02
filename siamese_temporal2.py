@@ -14,6 +14,7 @@ import pandas as pd
 from sys import argv
 from custom_layers import *
 from collections import Counter
+import os
 
 tam = 2
 metadata_dict = {}
@@ -111,15 +112,12 @@ if __name__ == '__main__':
       aux = keys[:]
       aux.pop(k)
       trn = data[aux[0]] + data[aux[1]]
-      tst = data[aux[2]] + data[aux[3]]
 
       train_steps_per_epoch = ceil(len(trn) / batch_size)
       val_steps_per_epoch = ceil(len(val) / batch_size)
-      tst_steps_per_epoch = ceil(len(tst) / batch_size)
 
       ex1 = ProcessPoolExecutor(max_workers = 4)
       ex2 = ProcessPoolExecutor(max_workers = 4)
-      ex3 = ProcessPoolExecutor(max_workers = 4)
 
       trnGen = generator_temporal(trn, batch_size, ex1, input1, input2, tam, metadata_dict, metadata_length, augmentation=True)
       tstGen = generator_temporal(val, batch_size, ex2, input1, input2, tam, metadata_dict, metadata_length)
@@ -136,14 +134,25 @@ if __name__ == '__main__':
                                     validation_steps=val_steps_per_epoch)
 
       #validate plate model
-      tstGen2 = generator_temporal(val, batch_size, ex3, input1, input2, tam, metadata_dict, metadata_length, with_paths = True)
+      tstGen2 = generator_temporal(val, batch_size, ex2, input1, input2, tam, metadata_dict, metadata_length, with_paths = True)
       test_report('validation_temporal2_%d' % (k),siamese_net, val_steps_per_epoch, tstGen2)
-      del tstGen2
-      tstGen2 = generator_temporal(tst, batch_size, ex3, input1, input2, tam, metadata_dict, metadata_length, with_paths = True)
-      test_report('test_temporal2_%d' % (k),siamese_net, tst_steps_per_epoch, tstGen2)
 
       siamese_net.save(f1)
+
   elif type1 == 'test':
+    folder = argv[3]
+    for k in range(len(keys)):
+      K.clear_session()
+      aux = keys[:]
+      aux.pop(k)
+      tst = data[aux[2]] + data[aux[3]]
+      ex3 = ProcessPoolExecutor(max_workers = 4)
+      tst_steps_per_epoch = ceil(len(tst) / batch_size)
+      tstGen2 = generator(tst, batch_size, ex3, input1, input2, with_paths = True)
+      f1 = os.path.join(folder,'model_temporal2_%d.h5' % (k))
+      siamese_net = load_model(f1)
+      test_report('test_temporal2_%d' % (k),siamese_net, tst_steps_per_epoch, tstGen2)
+  elif type1 == 'predict':
     results = []
     data = json.load(open(argv[2]))
     alpha_dict = {i.upper():j/35 for j,i in enumerate(string.ascii_uppercase + string.digits)}
@@ -173,11 +182,12 @@ if __name__ == '__main__':
 
     X = [img3, img4, metadata]
 
-    k = 0
-    for f1 in argv[3:]:
+    folder = argv[3]
+    for k in range(len(keys)):
+      K.clear_session()
+      f1 = os.path.join(folder,'model_temporal2_%d.h5' % (k))
       model = load_model(f1)
       Y_ = model.predict(X)
       results.append(np.argmax(Y_[0]))
       print("model %d: %s" % (k+1,"positive" if results[k]==POS else "negative"))
-      k+=1
     print("final result: %s" % ("positive" if Counter(results).most_common(1)[0][0]==POS else "negative"))

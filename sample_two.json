@@ -1,0 +1,6 @@
+{
+  "img1_shape":"data_sample/car1_1.png",
+  "img2_shape":"data_sample/car2_1.png",
+  "img1_plate":"data_sample/plate1_1.png",
+  "img2_plate":"data_sample/plate2_1.png"
+}

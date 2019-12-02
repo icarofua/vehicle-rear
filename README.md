@@ -45,7 +45,7 @@ As another contribution, we discuss and compare three alternative architectures 
 ![Alt text](fig3.png)
 
 ## 1. Installation of the packages
-pip install keras tensorflow scikit-learn futures imgaug
+pip3 install keras tensorflow scikit-learn futures imgaug
 
 ## 2 Configuration
 config.py
@@ -65,85 +65,85 @@ OBS: If you don't decompress the data.tgz in the vehicle-ReId folder, change the
 In this process, the data are loaded from the json file generated for the step 6, and it is runned the process of training and validation.
 
 ### 3.1 siamese plate
-python siamese_plate_stream.py train
+python3 siamese_plate_stream.py train
 
 ### 3.2 siamese shape
 You can train the siamese shape with the following algorithms: resnet50, resnet6, resnet8, mccnn, vgg16, googlenet, lenet5, matchnet or smallvgg.
 
-Example: python siamese_shape_stream.py train smallvgg
+Example: python3 siamese_shape_stream.py train smallvgg
 
 ### 3.3 siamese two stream (plate + shape)
-python siamese_two_stream.py train
+python3 siamese_two_stream.py train
 
 ### 3.4 siamese three stream (plate + shape + ocr)
-python siamese_three_stream.py train
+python3 siamese_three_stream.py train
 
 ### 3.5 siamese two stream (ocr + shape)
-python siamese_two_stream_ocr.py train
+python3 siamese_two_stream_ocr.py train
 
 ### 3.6 siamese temporal stream with 2 images
-python siamese_temporal2.py train
+python3 siamese_temporal2.py train
 
 ### 3.7 siamese temporal stream with 3 images
-python siamese_temporal3.py train
+python3 siamese_temporal3.py train
 
 ## 4 Testing the algorithms
 In this process, the data are loaded from the json file generated for the step 6.
 
 ### 4.1 siamese plate
-python siamese_plate_stream.py test models/Plate
+python3 siamese_plate_stream.py test models/Plate
 
 ### 4.2 siamese shape
 You can train the siamese shape with the following algorithms: resnet50, resnet6, resnet8, mccnn, vgg16, googlenet, lenet5, matchnet or smallvgg.
 
-Example: python siamese_shape_stream.py test smallvgg models/Shape/Smallvgg
+Example: python3 siamese_shape_stream.py test smallvgg models/Shape/Smallvgg
 
 ### 4.3 siamese two stream (plate + shape)
-python siamese_two_stream.py test models/Two-Stream-Shape-Plate
+python3 siamese_two_stream.py test models/Two-Stream-Shape-Plate
 
 ### 4.4 siamese three stream (plate + shape + ocr)
-python siamese_three_stream.py test models/Three-Stream
+python3 siamese_three_stream.py test models/Three-Stream
 
 ### 4.5 siamese two stream (ocr + shape)
-python siamese_two_stream_ocr.py test models/Two-Stream-Shape-OCR
+python3 siamese_two_stream_ocr.py test models/Two-Stream-Shape-OCR
 
 ### 4.6 siamese temporal stream with 2 images
-python siamese_temporal2.py test models/Temporal2
+python3 siamese_temporal2.py test models/Temporal2
 
 ### 4.7 siamese temporal stream with 3 images
-python siamese_temporal3.py test models/Temporal3
+python3 siamese_temporal3.py test models/Temporal3
 
 
 ## 5 Predict the algorithms using some samples
 In this process, for each algorithm is loaded the models and a json file contained the samples.
 
 ### 5.1 siamese plate
-python siamese_plate_stream.py predict sample_plate.json models/Plate
+python3 siamese_plate_stream.py predict sample_plate.json models/Plate
 
 ### 5.2 siamese shape
 You can predict the siamese shape with the following algorithms: resnet50, resnet6, resnet8, mccnn, vgg16, googlenet, lenet5, matchnet or smallvgg.
 
-Example: python siamese_shape_stream.py predict smallvgg sample_shape.json models/Shape/Smallvgg
+Example: python3 siamese_shape_stream.py predict smallvgg sample_shape.json models/Shape/Smallvgg
 
 ### 5.3 siamese two stream (plate + shape)
-python siamese_two_stream.py predict sample_two.json models/Two-Stream-Shape-Plate
+python3 siamese_two_stream.py predict sample_two.json models/Two-Stream-Shape-Plate
 
 ### 5.4 siamese three stream (plate + shape + ocr)
-python siamese_three_stream.py predict sample_three.json models/Three-Stream
+python3 siamese_three_stream.py predict sample_three.json models/Three-Stream
 
 ### 5.5 siamese two stream (ocr + shape)
-python siamese_two_stream_ocr.py predict sample_two_ocr.json models/Two-Stream-Shape-OCR
+python3 siamese_two_stream_ocr.py predict sample_two_ocr.json models/Two-Stream-Shape-OCR
 
 ### 5.6 siamese temporal stream with 2 images (ocr + shape)
-python siamese_temporal2.py predict sample_temporal2.json models/Temporal2
+python3 siamese_temporal2.py predict sample_temporal2.json models/Temporal2
 
 ### 5.7 siamese temporal stream with 3 images (ocr + shape)
-python siamese_temporal3.py predict sample_temporal3.json models/Temporal3
+python3 siamese_temporal3.py predict sample_temporal3.json models/Temporal3
 
 ### 5.8 OCR model
 
 In the OCR folder under models (models.tgz), you must first run "make" in the "darknet" folder 
-to compile Darknet and then run "python3 cnn-ocr.py image_file" in the same folder to run the CNN-OCR 
+to compile Darknet and then run "python33 cnn-ocr.py image_file" in the same folder to run the CNN-OCR 
 model.
 For more information, please refer to the README.txt file in the OCR folder.
 
@@ -151,7 +151,7 @@ For more information, please refer to the README.txt file in the OCR folder.
 ## 6. Generating the Datasets
 You can generate the datasets for 1 image or the temporal stream between 2 to 5 images.
 
-Example: python generate_n_sets.py 1
+Example: python3 generate_n_sets.py 1
 or
-python generate_n_sets.py 2
+python3 generate_n_sets.py 2
 

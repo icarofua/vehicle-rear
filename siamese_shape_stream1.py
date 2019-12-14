@@ -16,15 +16,13 @@ from custom_layers import *
 from collections import Counter
 import os
 #------------------------------------------------------------------------------
-def siamese_model(model, input1, input2):
-  left_input_P = Input(input1)
-  right_input_P = Input(input1)
+def siamese_model(model, input2):
   left_input_C = Input(input2)
   right_input_C = Input(input2)
   convnet_car = model(input2)
   encoded_l_C = convnet_car(left_input_C)
   encoded_r_C = convnet_car(right_input_C)
-  inputs = [left_input_P, right_input_P, left_input_C, right_input_C]
+  inputs = [left_input_C, right_input_C]
 
   # Add the distance function to the network
   x = L1_layer([encoded_l_C, encoded_r_C])
@@ -105,9 +103,9 @@ if __name__ == '__main__':
       ex1 = ProcessPoolExecutor(max_workers = 4)
       ex2 = ProcessPoolExecutor(max_workers = 4)
 
-      trnGen = generator(trn, batch_size, ex1, input1, input2,  augmentation=True)
-      tstGen = generator(val, batch_size, ex2, input1, input2)
-      siamese_net = siamese_model(model, input1, input2)
+      trnGen = generator(trn, batch_size, ex1, input1, input2,  augmentation=True, type='car')
+      tstGen = generator(val, batch_size, ex2, input1, input2, type='car')
+      siamese_net = siamese_model(model, input2)
 
       f1 = 'model_shape_%s_%d.h5' % (name,k)
 
@@ -119,12 +117,12 @@ if __name__ == '__main__':
                                     validation_steps=val_steps_per_epoch)
 
       #validate plate model
-      tstGen2 = generator(val, batch_size, ex2, input1, input2, with_paths = True)
+      tstGen2 = generator(val, batch_size, ex2, input1, input2, with_paths = True, type='car')
       test_report('validation_shape_%s_%d' % (name,k),siamese_net, val_steps_per_epoch, tstGen2)
 
       siamese_net.save(f1)
   elif type1 == 'test':
-    folder = argv[4]
+    folder = argv[3]
     for k in range(len(keys)):
       K.clear_session()
       aux = keys[:]
@@ -132,7 +130,7 @@ if __name__ == '__main__':
       tst = data[aux[2]] + data[aux[3]]
       ex3 = ProcessPoolExecutor(max_workers = 4)
       tst_steps_per_epoch = ceil(len(tst) / batch_size)
-      tstGen2 = generator(tst, batch_size, ex3, input1, input2, with_paths = True)
+      tstGen2 = generator(tst, batch_size, ex3, input1, input2, with_paths = True,type='car')
       f1 = os.path.join(folder,'model_shape_%s_%d.h5' % (name, k))
       siamese_net = load_model(f1)
       test_report('test_shape_%s_%d' % (name, k),siamese_net, tst_steps_per_epoch, tstGen2)

@@ -55,16 +55,14 @@ def read_metadata(labels):
   return metadata_dict
 
 #------------------------------------------------------------------------------
-def siamese_model(input1, input2):
-  left_input_P = Input(input1)
-  right_input_P = Input(input1)
+def siamese_model(input2):
   left_input_C = Input(input2)
   right_input_C = Input(input2)
   auxiliary_input = Input(shape=(metadata_length,), name='aux_input')
   convnet_car = small_vgg3d(input2)
   encoded_l_C = convnet_car(left_input_C)
   encoded_r_C = convnet_car(right_input_C)
-  inputs = [left_input_P, right_input_P, left_input_C, right_input_C, auxiliary_input]
+  inputs = [left_input_C, right_input_C, auxiliary_input]
 
   # Add the distance function to the network
   L1_distanceC = L1_layer([encoded_l_C, encoded_r_C])
@@ -101,7 +99,6 @@ if __name__ == '__main__':
 
   input1 = (image_size_h_p,image_size_w_p,nchannels)
   input2 = (image_size_h_c,image_size_w_c,nchannels)
-  input_temporal1 = (tam,image_size_h_p,image_size_w_p,nchannels)
   input_temporal2 = (tam,image_size_h_c,image_size_w_c,nchannels)
   type1 = argv[1]
 
@@ -121,7 +118,7 @@ if __name__ == '__main__':
 
       trnGen = generator_temporal(trn, batch_size, ex1, input1, input2, tam, metadata_dict, metadata_length, augmentation=True)
       tstGen = generator_temporal(val, batch_size, ex2, input1, input2, tam, metadata_dict, metadata_length)
-      siamese_net = siamese_model(input_temporal1, input_temporal2)
+      siamese_net = siamese_model(input_temporal2)
       print(siamese_net.summary())
 
       f1 = 'model_temporal2_%d.h5' % (k)
@@ -140,7 +137,7 @@ if __name__ == '__main__':
       siamese_net.save(f1)
 
   elif type1 == 'test':
-    folder = argv[3]
+    folder = argv[2]
     for k in range(len(keys)):
       K.clear_session()
       aux = keys[:]
@@ -148,7 +145,7 @@ if __name__ == '__main__':
       tst = data[aux[2]] + data[aux[3]]
       ex3 = ProcessPoolExecutor(max_workers = 4)
       tst_steps_per_epoch = ceil(len(tst) / batch_size)
-      tstGen2 = generator(tst, batch_size, ex3, input1, input2, with_paths = True)
+      tstGen2 = generator_temporal(tst, batch_size, ex3, input1, input2, with_paths = True)
       f1 = os.path.join(folder,'model_temporal2_%d.h5' % (k))
       siamese_net = load_model(f1)
       test_report('test_temporal2_%d' % (k),siamese_net, tst_steps_per_epoch, tstGen2)

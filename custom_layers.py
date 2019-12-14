@@ -513,7 +513,7 @@ def load_img(img, vec_size, vec_size2, metadata_dict):
   return d1
 
 #------------------------------------------------------------------------------
-def generator(features, batch_size, executor, vec_size, vec_size2, metadata_dict=None, metadata_length=0, augmentation=False, with_paths=False):
+def generator(features, batch_size, executor, vec_size, vec_size2, type=None,metadata_dict=None, metadata_length=0, augmentation=False, with_paths=False):
   N = len(features)
   indices = np.arange(N)
   batchInds = get_batch_inds(batch_size, indices, N)
@@ -566,7 +566,12 @@ def generator(features, batch_size, executor, vec_size, vec_size2, metadata_dict
       blabels2 = np.array(blabels)
       blabels = np_utils.to_categorical(blabels2, 2)
       y = {"class_output":blabels, "reg_output":blabels2}
-      result = [[b1, b2, b3, b4], y]
+      if type is None:
+        result = [[b1, b2, b3, b4], y]
+      elif type == 'plate':
+        result = [[b1, b2], y]
+      elif type == 'car':
+        result = [[b3, b4], y]
       if metadata_length>0:
         result[0].append(metadata)
       if with_paths:
@@ -657,7 +662,7 @@ def generator_temporal(features, batch_size, executor, vec_size, vec_size2, tam,
       blabels2 = np.array(blabels)
       blabels = np_utils.to_categorical(blabels2, 2)
       y = {"class_output":blabels, "reg_output":blabels2}
-      result = [[b1, b2, b3, b4, metadata], y]
+      result = [[b3, b4, metadata], y]
 
       if with_paths:
           result += [[p1,p2]]

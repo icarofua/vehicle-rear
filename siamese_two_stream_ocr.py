@@ -51,16 +51,14 @@ def read_metadata(labels):
   return metadata_dict
 
 #------------------------------------------------------------------------------
-def siamese_model(input1, input2):
-  left_input_P = Input(input1)
-  right_input_P = Input(input1)
+def siamese_model(input2):
   left_input_C = Input(input2)
   right_input_C = Input(input2)
   auxiliary_input = Input(shape=(metadata_length,), name='aux_input')
   convnet_car = small_vgg_car(input2)
   encoded_l_C = convnet_car(left_input_C)
   encoded_r_C = convnet_car(right_input_C)
-  inputs = [left_input_P, right_input_P, left_input_C, right_input_C, auxiliary_input]
+  inputs = [left_input_C, right_input_C, auxiliary_input]
 
   # Add the distance function to the network
   x = L1_layer([encoded_l_C, encoded_r_C])
@@ -115,9 +113,9 @@ if __name__ == '__main__':
       ex1 = ProcessPoolExecutor(max_workers = 4)
       ex2 = ProcessPoolExecutor(max_workers = 4)
 
-      trnGen = generator(trn, batch_size, ex1, input1, input2, metadata_dict,metadata_length=metadata_length, augmentation=True)
-      tstGen = generator(val, batch_size, ex2, input1, input2, metadata_dict,metadata_length=metadata_length)
-      siamese_net = siamese_model(input1, input2)
+      trnGen = generator(trn, batch_size, ex1, input1, input2, metadata_dict,metadata_length=metadata_length, augmentation=True, type='car')
+      tstGen = generator(val, batch_size, ex2, input1, input2, metadata_dict,metadata_length=metadata_length, type='car')
+      siamese_net = siamese_model(input2)
       print(siamese_net.summary())
 
       f1 = 'model_two_stream_ocr_%d.h5' % (k)
@@ -130,13 +128,13 @@ if __name__ == '__main__':
                                     validation_steps=val_steps_per_epoch)
 
       #validate plate model
-      tstGen2 = generator(val, batch_size, ex2, input1, input2, metadata_dict,metadata_length=metadata_length, with_paths = True)
+      tstGen2 = generator(val, batch_size, ex2, input1, input2, metadata_dict,metadata_length=metadata_length, with_paths = True, type='car')
       test_report('validation_two_stream_ocr_%d' % (k),siamese_net, val_steps_per_epoch, tstGen2)
 
       siamese_net.save(f1)
 
   elif type1 == 'test':
-    folder = argv[3]
+    folder = argv[2]
     for k in range(len(keys)):
       K.clear_session()
       aux = keys[:]
@@ -144,7 +142,7 @@ if __name__ == '__main__':
       tst = data[aux[2]] + data[aux[3]]
       ex3 = ProcessPoolExecutor(max_workers = 4)
       tst_steps_per_epoch = ceil(len(tst) / batch_size)
-      tstGen2 = generator(tst, batch_size, ex3, input1, input2, with_paths = True)
+      tstGen2 = generator(tst, batch_size, ex3, input1, input2, with_paths = True, type='car')
       f1 = os.path.join(folder,'model_two_stream_ocr_%d.h5' % (k))
       siamese_net = load_model(f1)
       test_report('test_two_stream_ocr_%d' % (k),siamese_net, tst_steps_per_epoch, tstGen2)

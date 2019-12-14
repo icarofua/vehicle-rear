@@ -139,7 +139,7 @@ if __name__ == '__main__':
       siamese_net.save(f1)
 
   elif type1 == 'test':
-    folder = argv[3]
+    folder = argv[2]
     for k in range(len(keys)):
       K.clear_session()
       aux = keys[:]

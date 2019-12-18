@@ -45,7 +45,7 @@ As another contribution, we discuss and compare three alternative architectures 
 ![Alt text](fig3.png)
 
 ## 1. Installation of the packages
-pip3 install keras==2.2.2 tensorflow==1.9.0 scikit-learn==0.20.0 futures==3.2.0 imgaug==0.2.9
+pip3 install keras==2.2.4 tensorflow==1.12.0 scikit-learn==0.20.3 futures imgaug==0.2.9
 
 ## 2 Configuration
 config.py

@@ -1,3 +1,4 @@
+
 # Demo code for journal "Vehicle Re-identification: exploring feature fusion using multi-stream convolutional networks". (https://arxiv.org/abs/1911.05541)
 
 ## Citation
@@ -52,7 +53,7 @@ As another contribution, we discuss and compare three alternative architectures 
 
 To install all python packages, please run the following command:
 ```
-pip3 install keras==2.2.4 tensorflow==1.12.0 scikit-learn==0.20.3 futures imgaug==0.2.9
+pip3 install -r requirements.txt
 ```
 ## 2 Configuration
 config.py

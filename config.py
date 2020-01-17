@@ -16,14 +16,14 @@ K.set_session(sess)
 POS = 1 #positive class
 NEG = 0 #negative clas
 batch_size = 128
-NUM_EPOCHS = 1
+NUM_EPOCHS = 10
 nchannels=3 #number of channels
 image_size_w_p = 96 #image´s width for registration plate
 image_size_h_p = 48 #image´s height for registration plate
 image_size_w_c = 64 #image´s width for vehicle´s shape
 image_size_h_c = 64 #image´s height for vehicle´s shape
 
-path = 'data' #path containing dataset2 and json files
+path = '../data' #path containing dataset2 and json files
 folder_cross1 = '%s/dataset2/Camera1' % (path)
 folder_cross2 = '%s/dataset2/Camera2' % (path)
 plt_name="classes"

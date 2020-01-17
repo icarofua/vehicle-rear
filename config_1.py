@@ -16,7 +16,7 @@ K.set_session(sess)
 POS = 1 #positive class
 NEG = 0 #negative clas
 batch_size = 128
-NUM_EPOCHS = 1
+NUM_EPOCHS = 10
 nchannels=3 #number of channels
 image_size_w_p = 96 #image´s width for registration plate
 image_size_h_p = 48 #image´s height for registration plate

@@ -74,8 +74,12 @@ if __name__ == '__main__':
     image_size_w_c = 128
   elif name == 'lenet5':
     model = lenet5
+    image_size_h_c = 128
+    image_size_w_c = 128
   elif name == 'matchnet':
     model = matchnet
+    image_size_h_c = 128
+    image_size_w_c = 128
   elif name == 'mccnn':
     model = mccnn
   elif name == 'googlenet':

@@ -1,6 +1,8 @@
 
 # Demo code for journal "Vehicle Re-identification: exploring feature fusion using multi-stream convolutional networks". (https://arxiv.org/abs/1911.05541)
 
+## Demo video for journal in [here](https://youtu.be/0FoiyMTTQJs).
+
 ## Citation
 
 If you find our work useful in your research, please cite our paper:

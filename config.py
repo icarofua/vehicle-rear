@@ -34,7 +34,7 @@ ocr_file = '%s/ocr/0p.txt' % (path)
 metadata_length = 35
 tam_max = 3
 L1_layer = Lambda(lambda tensor:K.abs(tensor[0] - tensor[1]))
-
+amount = 10
 augs = [[],[],[],[]]
 
 seq_car = iaa.Sequential(

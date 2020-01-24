@@ -20,7 +20,6 @@ from collections import Counter
 from keras import backend as K
 from keras.layers import *
 from keras.models import Model, load_model
-import keras_metrics as km
 import string
 import pandas as pd
 import imgaug as ia

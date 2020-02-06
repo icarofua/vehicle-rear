@@ -1,7 +1,7 @@
 futures==3.1.1
 imgaug==0.3.0
-Keras==2.3.1
-numpy==1.17.4
-pandas==0.25.3
-scikit-learn==0.22
-tensorflow==2.0.0a0
+Keras>=2.3.1
+numpy>=1.17.4
+pandas>=0.25.3
+scikit-learn>=0.22
+tensorflow==1.13.1

@@ -23,7 +23,7 @@ image_size_h_p = 48 #image´s height for registration plate
 image_size_w_c = 64 #image´s width for vehicle´s shape
 image_size_h_c = 64 #image´s height for vehicle´s shape
 
-path = 'data' #path containing dataset2 and json files
+path = '../data' #path containing dataset2 and json files
 folder_cross1 = '%s/dataset2/Camera1' % (path)
 folder_cross2 = '%s/dataset2/Camera2' % (path)
 plt_name="classes"
@@ -34,7 +34,7 @@ ocr_file = '%s/ocr/0p.txt' % (path)
 metadata_length = 35
 tam_max = 3
 L1_layer = Lambda(lambda tensor:K.abs(tensor[0] - tensor[1]))
-
+amount = 10
 augs = [[],[],[],[]]
 
 seq_car = iaa.Sequential(

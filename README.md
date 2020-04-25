@@ -25,7 +25,7 @@ If you find our work useful in your research, please cite our paper:
 ## Authors
 
 - Ícaro Oliveira de Oliveira (UTFPR) [mailto](mailto:icarofua@gmail.com)
-- Rayson Laroca (UFPR) [mailto](mailto:raysonlaroca@gmail.com)
+- Rayson Laroca (UFPR) [mailto](mailto:rblsantos@inf.ufpr.br)
 - David Menotti (UFPR) [mailto](mailto:menottid@gmail.com)
 - Keiko Veronica Ono Fonseca (UTFPR) [mailto](mailto:keikoveronicaono@gmail.com)
 - Rodrigo Minetto (UTFPR) [mailto](mailto:rodrigo.minetto@gmail.com)

@@ -1,30 +1,12 @@
-from sklearn import metrics
-from keras.preprocessing import image
-from keras.layers import *
-from keras.models import Model,Sequential
-from keras import optimizers
-from keras.regularizers import l2
-from keras.applications import resnet50
-from keras.optimizers import Adam
+from keras.models import Model
+from keras.applications import resnet50, vgg16
 from keras.utils import np_utils
 import numpy as np
 from keras.preprocessing import image
-from concurrent.futures import ProcessPoolExecutor
-from functools import partial
-from config import *
-from math import ceil
-import json
-from keras.callbacks import ModelCheckpoint
 from sklearn import metrics
-from collections import Counter
-from keras import backend as K
 from keras.layers import *
-from keras.models import Model, load_model
-import string
-import pandas as pd
-import imgaug as ia
-from imgaug import augmenters as iaa
-from keras.optimizers import Adam
+from config import batch_size, image_size_h_p, image_size_w_p, image_size_h_c, image_size_w_c, nchannels
+from tensorflow.python.keras.utils.data_utils import Sequence
 
 # global constants
 DIM_ORDERING = 'tf'
@@ -279,7 +261,6 @@ def resnet6(input_shape):
 def resnet8(input_shape):
 
     input1 = Input(input_shape)
-    
     x1 = Conv2D(32, (5, 5), strides=[2,2], padding='same')(input1)
     x1 = MaxPooling2D(pool_size=(3, 3), strides=[2,2])(x1)
 
@@ -336,37 +317,21 @@ def resnet8(input_shape):
     return Model(input1,x) 
 
 def resnet50_model(input_shape):
-  resnet_model = resnet50.ResNet50()
-  return Model(inputs=resnet_model.input,outputs=resnet_model.get_layer("avg_pool").output)
+  model = resnet50.ResNet50(weights=None,include_top=False,input_shape=input_shape)
+  x = Flatten()(model.output)
+  baseModel = Model(inputs=model.input,outputs=x)
+  #for layer in baseModel.layers:
+  #  layer.trainable = False
+  return baseModel
 
+def vgg16_model(input_shape):
+  model = vgg16.VGG16(weights=None, include_top=False, input_shape=input_shape)
+  x = Flatten()(model.output)
+  baseModel = Model(inputs=model.input,outputs=x)
+  #for layer in baseModel.layers:
+  #  layer.trainable = False
+  return baseModel
 
-def vgg_original (input_shape):
-    input1 = Input(input_shape)
-
-    x = Conv2D(64, (3, 3), activation='relu', padding='same')(input1)
-    x = Conv2D(64, (3, 3), activation='relu', padding='same')(x)
-    x = MaxPooling2D((2, 2), strides=(2, 2))(x)
-
-    x = Conv2D(128, (3, 3), activation='relu', padding='same')(x)
-    x = Conv2D(128, (3, 3), activation='relu', padding='same')(x)
-    x = MaxPooling2D((2, 2), strides=(2, 2))(x)
-
-    x = Conv2D(256, (3, 3), activation='relu', padding='same')(x)
-    x = Conv2D(256, (3, 3), activation='relu', padding='same')(x)
-    x = Conv2D(256, (3, 3), activation='relu', padding='same')(x)
-    x = MaxPooling2D((2, 2), strides=(2, 2))(x)
-
-    x = Conv2D(512, (3, 3), activation='relu', padding='same')(x)
-    x = Conv2D(512, (3, 3), activation='relu', padding='same')(x)
-    x = Conv2D(512, (3, 3), activation='relu', padding='same')(x)
-    x = MaxPooling2D((2, 2), strides=(2, 2))(x)
-
-    x = Conv2D(512, (3, 3), activation='relu', padding='same')(x)
-    x = Conv2D(512, (3, 3), activation='relu', padding='same')(x)
-    x = Conv2D(512, (3, 3), activation='relu', padding='same')(x)
-    x = Flatten()(x)
-
-    return Model(input1,x)
 
 def small_vgg_car(input_shape):
     input1 = Input(input_shape)
@@ -437,20 +402,13 @@ def small_vgg3d(input_shape):
     return Model(input1,x)
 
 #------------------------------------------------------------------------------
-def get_batch_inds(batch_size, idx, N):
-    batchInds = []
-    idx0 = 0
-
-    toProcess = True
-    while toProcess:
-        idx1 = idx0 + batch_size
-        if idx1 >= N:
-            idx1 = N
-            toProcess = False
-        batchInds.append(idx[idx0:idx1])
-        idx0 = idx1
-
-    return batchInds
+def fold(list1, ind, train=False):
+    _list1 = list1.copy()
+    _list1.pop(ind)
+    if train:
+        return [_list1[i % len(_list1)] for i in [ind+2,ind+3]]
+    else:
+        return [_list1[i % len(_list1)] for i in [ind+4,ind+5]]
 #------------------------------------------------------------------------------
 def calculate_metrics(ytrue1, ypred1):
     conf = metrics.confusion_matrix(ytrue1, ypred1, [0,1])
@@ -465,18 +423,18 @@ def calculate_metrics(ytrue1, ypred1):
     return maxres
 
 #------------------------------------------------------------------------------
-def test_report(model_name, model, num_test_steps, test_gen):
+def test_report(model_name, model, test_gen):
     print("=== Evaluating model: {:s} ===".format(model_name))
     a = open("%s_inferences_output.txt" % (model_name), "w")
     ytrue, ypred = [], []
-    for i in range(num_test_steps):
-        X, Y, paths = next(test_gen)
-        Y_ = model.predict(X)
-        for y1, yreg, y2, p0, p1 in zip(Y_[0].tolist(), Y_[1].tolist(), Y['class_output'].argmax(axis=-1).tolist(), paths[0], paths[1]):
-          y1_class = np.argmax(y1)
-          ypred.append(y1_class)
-          ytrue.append(y2)
-          a.write("%s;%s;%d;%d;%f;%s\n" % (p0, p1, y2, y1_class, yreg[0], str(y1)))
+    for i in range(len(test_gen)):
+      X, Y, paths = test_gen[i]
+      Y_ = model.predict(X)
+      for y1, yreg, y2, p0, p1 in zip(Y_[0].tolist(), Y_[1].tolist(), Y['class_output'].argmax(axis=-1).tolist(), paths[0], paths[1]):
+        y1_class = np.argmax(y1)
+        ypred.append(y1_class)
+        ytrue.append(y2)
+        a.write("%s;%s;%d;%d;%f;%s\n" % (p0, p1, y2, y1_class, yreg[0], str(y1)))
 
     a.write('tp: %d, tn: %d, fp: %d, fn: %d P:%0.2f R:%0.2f F:%0.2f A:%0.2f' % calculate_metrics(ytrue, ypred))
     a.close()
@@ -486,7 +444,6 @@ def process_load(f1, vec_size):
     _i1 = image.img_to_array(_i1, dtype='uint8')
     return _i1
 
-#------------------------------------------------------------------------------
 def load_img(img, vec_size, vec_size2, metadata_dict):
   iplt0 = process_load(img[0][0], vec_size)
   iplt1 = process_load(img[2][0], vec_size)
@@ -505,90 +462,96 @@ def load_img(img, vec_size, vec_size2, metadata_dict):
         }
   if metadata_dict is not None:
     diff = abs(np.array(metadata_dict[img[0][0]][:7]) - np.array(metadata_dict[img[2][0]][:7])).tolist()
-    for i in range(len(diff)):
-      diff[i] = 1 if diff[i] else 0
+    diff = [1 if i else 0 for i in diff]
     d1['metadata'] = np.array(metadata_dict[img[0][0]] + metadata_dict[img[2][0]] + diff)
-
   return d1
 
-#------------------------------------------------------------------------------
-def generator(features, batch_size, executor, vec_size, vec_size2, type=None,metadata_dict=None, metadata_length=0, augmentation=False, with_paths=False):
-  N = len(features)
-  indices = np.arange(N)
-  batchInds = get_batch_inds(batch_size, indices, N)
 
-  while True:
-    for inds in batchInds:
-      futures = []
-      _vec_size = (len(inds),) + vec_size
-      b1 = np.zeros(_vec_size)
-      b2 = np.zeros(_vec_size)
-      _vec_size2 = (len(inds),) + vec_size2
-      b3 = np.zeros(_vec_size2)
-      b4 = np.zeros(_vec_size2)
+class SiameseSequence(Sequence):
+    def __init__(self,features, 
+                augmentations,
+                batch_size=batch_size,
+                input1=(image_size_h_p,image_size_w_p,nchannels),
+                input2=(image_size_h_c,image_size_w_c,nchannels), 
+                type1=None,
+                metadata_dict=None, 
+                metadata_length=0, 
+                with_paths=False):
+        self.features = features
+        self.batch_size = batch_size
+        self.vec_size = input1
+        self.vec_size2 = input2
+        self.type = type1
+        self.metadata_dict = metadata_dict
+        self.metadata_length = metadata_length
+        self.augment = augmentations
+        self.with_paths = with_paths
 
-      blabels = np.zeros((len(inds)))
-      p1 = []
-      p2 = []
-      c1 = []
-      c2 = []
-      if metadata_length>0:
-        metadata = np.zeros((len(inds),metadata_length))
+    def __len__(self):
+        return int(np.ceil(len(self.features) / 
+            float(self.batch_size)))
 
-      futures = [executor.submit(partial(load_img, features[index], vec_size, vec_size2, metadata_dict)) for index in inds]
-      results = [future.result() for future in futures]
+    def __getitem__(self, idx):
+        start = idx * self.batch_size
+        end = (idx + 1) * self.batch_size
+        batch = self.features[start:end]
+        futures = []
+        _vec_size = (len(batch),) + self.vec_size
+        b1 = np.zeros(_vec_size)
+        b2 = np.zeros(_vec_size)
+        _vec_size2 = (len(batch),) + self.vec_size2
+        b3 = np.zeros(_vec_size2)
+        b4 = np.zeros(_vec_size2)
+        blabels = np.zeros((len(batch)))
+        p1 = []
+        p2 = []
+        c1 = []
+        c2 = []
+        if self.metadata_length>0:
+            metadata = np.zeros((len(batch),self.metadata_length))
 
-      for i,r in enumerate(results):
-        b1[i,:,:,:] = r['i0']
-        b2[i,:,:,:] = r['i1']
-        blabels[i] = r['l']
-        p1.append(r['p1'])
-        p2.append(r['p2'])
-        c1.append(r['c1'])
-        c2.append(r['c2'])
-        b3[i,:,:,:] = r['i2']
-        b4[i,:,:,:] = r['i3']
-        if metadata_length>0:
-          metadata[i,:] = r['metadata']
+        i1 = 0
+        for _b in batch:
+            res = load_img(_b, self.vec_size, self.vec_size2, self.metadata_dict)
+            if self.augment is not None:
+                b1[i1,:,:,:] = self.augment[0][0](image=res['i0'])["image"]
+                b2[i1,:,:,:] = self.augment[1][0](image=res['i1'])["image"]
+                b3[i1,:,:,:] = self.augment[2][0](image=res['i2'])["image"]
+                b4[i1,:,:,:] = self.augment[3][0](image=res['i3'])["image"]
+            else:
+                b1[i1,:,:,:] = res['i0']
+                b2[i1,:,:,:] = res['i1']
+                b3[i1,:,:,:] = res['i2']
+                b4[i1,:,:,:] = res['i3']
+            blabels[i1] = res['l']
+            p1.append(res['p1'])
+            p2.append(res['p2'])
+            c1.append(res['c1'])
+            c2.append(res['c2'])
+            if self.metadata_length>0:
+                metadata[i1,:] = res['metadata']
+            i1+=1
+        blabels2 = np.array(blabels).reshape(-1,1)
+        blabels = np_utils.to_categorical(blabels2, 2)
+        y = {"class_output":blabels, "reg_output":blabels2}
+        if self.type is None:
+            result = [[b1, b2, b3, b4], y]
+        elif self.type == 'plate':
+            result = [[b1, b2], y]
+        elif self.type == 'car':
+            result = [[b3, b4], y]
+        if self.metadata_length>0:
+            result[0].append(metadata)
+        if self.with_paths:
+            result += [[p1,p2]]
 
-      if augmentation:
-        b1 = augs[0][0].augment_images(b1.astype('uint8')) / 255
-        b2 = augs[1][0].augment_images(b2.astype('uint8')) / 255
-        b3 = augs[2][0].augment_images(b3.astype('uint8')) / 255
-        b4 = augs[3][0].augment_images(b4.astype('uint8')) / 255
-      else:
-        b1 = b1 / 255
-        b2 = b2 / 255
-        b3 = b3 / 255
-        b4 = b4 / 255
+        return result
 
-      blabels2 = np.array(blabels)
-      blabels = np_utils.to_categorical(blabels2, 2)
-      y = {"class_output":blabels, "reg_output":blabels2}
-      if type is None:
-        result = [[b1, b2, b3, b4], y]
-      elif type == 'plate':
-        result = [[b1, b2], y]
-      elif type == 'car':
-        result = [[b3, b4], y]
-      if metadata_length>0:
-        result[0].append(metadata)
-      if with_paths:
-          result += [[p1,p2]]
+def load_img_temporal(img, vec_size2, tam, metadata_dict):
+  iplt2 = [process_load(img[1][i], vec_size2, None) for i in range(tam)]
+  iplt3 = [process_load(img[3][i], vec_size2, None) for i in range(tam)]
 
-      yield result
-
-#------------------------------------------------------------------------------
-
-def load_img_temporal(img, vec_size, vec_size2, tam, metadata_dict):
-  iplt0 = [process_load(img[0][i], vec_size) for i in range(tam)]
-  iplt1 = [process_load(img[2][i], vec_size) for i in range(tam)]
-  iplt2 = [process_load(img[1][i], vec_size2) for i in range(tam)]
-  iplt3 = [process_load(img[3][i], vec_size2) for i in range(tam)]
-
-  d1 = {"i0":iplt0,
-        "i1":iplt1,
-        "i2":iplt2,
+  d1 = {"i2":iplt2,
         "i3":iplt3,
         "l":img[4],
         "p1":str(img[0]),
@@ -605,65 +568,63 @@ def load_img_temporal(img, vec_size, vec_size2, tam, metadata_dict):
     d1['metadata'] += metadata_dict[img[0][i]] + metadata_dict[img[2][i]] + diff
   d1['metadata'] = np.array(d1['metadata'])
   return d1
-#------------------------------------------------------------------------------
-def generator_temporal(features, batch_size, executor, vec_size, vec_size2, tam, metadata_dict, metadata_length, augmentation=False, with_paths=False):
-  N = len(features)
-  indices = np.arange(N)
-  batchInds = get_batch_inds(batch_size, indices, N)
 
-  while True:
-    for inds in batchInds:
-      futures = []
-      _vec_size = (len(inds),tam, ) + vec_size
-      b1 = np.zeros(_vec_size)
-      b2 = np.zeros(_vec_size)
-      _vec_size2 = (len(inds),tam, ) + vec_size2
-      b3 = np.zeros(_vec_size2)
-      b4 = np.zeros(_vec_size2)
+class SiameseSequenceTemporal(Sequence):
+    def __init__(self,features, 
+                augmentations,
+                tam, 
+                metadata_dict, 
+                metadata_length, 
+                batch_size,
+                with_paths=False):
+        self.tam = tam
+        self.features = features
+        self.batch_size = batch_size
+        self.vec_size2 = (image_size_h_c,image_size_w_c,nchannels)
+        self.metadata_dict = metadata_dict
+        self.metadata_length = metadata_length
+        self.augment = augmentations
+        self.with_paths = with_paths
 
-      blabels = np.zeros((len(inds)))
-      p1 = []
-      p2 = []
-      c1 = []
-      c2 = []
-      metadata = np.zeros((len(inds),metadata_length))
+    def __len__(self):
+        return int(np.ceil(len(self.features) / 
+            float(self.batch_size)))
 
-      futures = [executor.submit(partial(load_img_temporal, features[index], vec_size, vec_size2, tam, metadata_dict)) for index in inds]
-      results = [future.result() for future in futures]
+    def __getitem__(self, idx):
+        start = idx * self.batch_size
+        end = (idx + 1) * self.batch_size
+        batch = self.features[start:end]
+        futures = []
+        _vec_size2 = (len(batch),self.tam,) + self.vec_size2
+        b3 = np.zeros(_vec_size2)
+        b4 = np.zeros(_vec_size2)
+        blabels = np.zeros((len(batch)))
+        p1 = []
+        p2 = []
+        c1 = []
+        c2 = []
+        if self.metadata_length>0:
+            metadata = np.zeros((len(batch),self.metadata_length))
+        i = 0
+        for _b in batch:
+            r = load_img_temporal(_b, self.vec_size2, self.tam, self.metadata_dict)
+            for j in range(self.tam):
+                b3[i,j,:,:,:] = self.augment[2][j](image=r['i2'][j])["image"]
+                b4[i,j,:,:,:] = self.augment[3][j](image=r['i3'][j])["image"]
+            blabels[i] = r['l']
+            p1.append(r['p1'])
+            p2.append(r['p2'])
+            c1.append(r['c1'])
+            c2.append(r['c2'])
+            if self.metadata_length>0:
+                metadata[i,:] = r['metadata']
+            i+=1
+        blabels2 = np.array(blabels).reshape(-1,1)
+        blabels = np_utils.to_categorical(blabels2, 2)
+        y = {"class_output":blabels, "reg_output":blabels2}
+        result = [[b3, b4, metadata], y]
 
-      for i,r in enumerate(results):
-        for j in range(tam):
-          b1[i,j,:,:,:] = r['i0'][j]
-          b2[i,j,:,:,:] = r['i1'][j]
-          b3[i,j,:,:,:] = r['i2'][j]
-          b4[i,j,:,:,:] = r['i3'][j]
-
-        blabels[i] = r['l']
-        p1.append(r['p1'])
-        p2.append(r['p2'])
-        c1.append(r['c1'])
-        c2.append(r['c2'])
-        metadata[i,:] = r['metadata']
-
-      if augmentation:
-        for j in range(tam):
-          b1[:,j,:] = augs[0][j].augment_images(b1[:,j,:].astype('uint8')) / 255
-          b2[:,j,:] = augs[1][j].augment_images(b2[:,j,:].astype('uint8')) / 255
-          b3[:,j,:] = augs[2][j].augment_images(b3[:,j,:].astype('uint8')) / 255
-          b4[:,j,:] = augs[3][j].augment_images(b4[:,j,:].astype('uint8')) / 255
-      else:
-        for j in range(tam):
-          b1[:,j,:] = b1[:,j,:] / 255
-          b2[:,j,:] = b2[:,j,:] / 255
-          b3[:,j,:] = b3[:,j,:] / 255
-          b4[:,j,:] = b4[:,j,:] / 255
-
-      blabels2 = np.array(blabels)
-      blabels = np_utils.to_categorical(blabels2, 2)
-      y = {"class_output":blabels, "reg_output":blabels2}
-      result = [[b3, b4, metadata], y]
-
-      if with_paths:
+        if self.with_paths:
           result += [[p1,p2]]
 
-      yield result
+        return result

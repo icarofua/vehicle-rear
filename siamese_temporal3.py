@@ -1,25 +1,22 @@
 from keras.optimizers import Adam
 from keras.utils import np_utils
 import numpy as np
-from concurrent.futures import ProcessPoolExecutor
-from functools import partial
 from config import *
-from math import ceil
 import json
 from keras import backend as K
 from keras.layers import Dense, Dropout
 from keras.models import Model, load_model
-import string
-import pandas as pd
 from sys import argv
 from custom_layers import *
 from collections import Counter
 import os
+import string
+import pandas as pd
 
-tam = 2
+tam = 3
 metadata_dict = {}
 metadata_length = metadata_length*tam
-
+batch_size=64
 
 #------------------------------------------------------------------------------
 def read_metadata(labels):
@@ -80,14 +77,12 @@ def siamese_model(input2):
   lossWeights = {"class_output": 1.0, "reg_output": 1.0}
 
   model = Model(inputs=inputs, outputs=[predF2, regF2])
-  model.compile(loss=losses, loss_weights=lossWeights,optimizer=optimizer)
+  model.compile(loss=losses, loss_weights=lossWeights,optimizer=optimizer,metrics=kmetrics)
 
   return model
 #------------------------------------------------------------------------------
 if __name__ == '__main__':
-  data = json.load(open('%s/dataset_2.json' % (path)))
-
-  keys = ['Set01','Set02','Set03','Set04','Set05']
+  data = json.load(open('%s/dataset_3.json' % (path)))
 
   labels = []
   for k in keys:
@@ -99,56 +94,43 @@ if __name__ == '__main__':
 
   input1 = (image_size_h_p,image_size_w_p,nchannels)
   input2 = (image_size_h_c,image_size_w_c,nchannels)
-  input_temporal3 = (tam,image_size_h_c,image_size_w_c,nchannels)
+  input_temporal2 = (tam,image_size_h_c,image_size_w_c,nchannels)
   type1 = argv[1]
 
   if type1=='train':
-    for k in range(len(keys)):
+    for k,val_idx in enumerate(keys):
       K.clear_session()
-      val = data[keys[k]]
-      aux = keys[:]
-      aux.pop(k)
-      trn = data[aux[0]] + data[aux[1]]
+      idx = fold(keys,k, train=True)
+      val = data[val_idx]
+      trn = data[idx[0]] + data[idx[1]]
 
-      train_steps_per_epoch = ceil(len(trn) / batch_size)
-      val_steps_per_epoch = ceil(len(val) / batch_size)
-
-      ex1 = ProcessPoolExecutor(max_workers = 4)
-      ex2 = ProcessPoolExecutor(max_workers = 4)
-
-      trnGen = generator_temporal(trn, batch_size, ex1, input1, input2, tam, metadata_dict, metadata_length, augmentation=True)
-      tstGen = generator_temporal(val, batch_size, ex2, input1, input2, tam, metadata_dict, metadata_length)
-      siamese_net = siamese_model(input_temporal3)
+      trnGen = SiameseSequenceTemporal(trn, train_augs, tam, metadata_dict, metadata_length, batch_size)
+      tstGen = SiameseSequenceTemporal(val, test_augs, tam, metadata_dict, metadata_length, batch_size)
+      siamese_net = siamese_model(input_temporal2)
       print(siamese_net.summary())
 
       f1 = 'model_temporal3_%d.h5' % (k)
 
       #fit model
       history = siamese_net.fit_generator(trnGen,
-                                    steps_per_epoch=train_steps_per_epoch,
                                     epochs=NUM_EPOCHS,
-                                    validation_data=tstGen,
-                                    validation_steps=val_steps_per_epoch)
+                                    validation_data=tstGen)
 
       #validate plate model
-      tstGen2 = generator_temporal(val, batch_size, ex2, input1, input2, tam, metadata_dict, metadata_length, with_paths = True)
-      test_report('validation_temporal3_%d' % (k),siamese_net, val_steps_per_epoch, tstGen2)
+      tstGen2 = SiameseSequenceTemporal(val, test_augs, tam, metadata_dict, metadata_length, batch_size, with_paths=True)
+      test_report('validation_temporal3_%d' % (k),siamese_net, tstGen2)
 
       siamese_net.save(f1)
 
   elif type1 == 'test':
     folder = argv[2]
     for k in range(len(keys)):
-      K.clear_session()
-      aux = keys[:]
-      aux.pop(k)
-      tst = data[aux[2]] + data[aux[3]]
-      ex3 = ProcessPoolExecutor(max_workers = 4)
-      tst_steps_per_epoch = ceil(len(tst) / batch_size)
-      tstGen2 = generator_temporal(tst, batch_size, ex3, input1, input2, with_paths = True)
+      idx = fold(keys,k, train=False)
+      tst = data[idx[0]] + data[idx[1]]
+      tstGen2 = SiameseSequenceTemporal(tst, test_augs, tam, metadata_dict, metadata_length, batch_size, with_paths=True)
       f1 = os.path.join(folder,'model_temporal3_%d.h5' % (k))
-      siamese_net = load_model(f1)
-      test_report('test_temporal3_%d' % (k),siamese_net, tst_steps_per_epoch, tstGen2)
+      siamese_net = load_model(f1, custom_objects=customs_func)
+      test_report('test_temporal3_%d' % (k),siamese_net, tstGen2)
   elif type1 == 'predict':
     results = []
     data = json.load(open(argv[2]))

@@ -47,7 +47,7 @@ If you find our work useful in your research, please cite our paper:
 
 	@article{oliveira2021vehicle,
 	  author = {I. O. {de Oliveira} and R. {Laroca} and D. {Menotti} and K. V. O. {Fonseca} and R. {Minetto}},
-	  title = {Vehicle-Rear: A new dataset to explorefeature fusion for vehicle identificationusing convolutional neural networks},
+	  title = {{Vehicle-Rear}: A new dataset to explore feature fusion for vehicle identification using convolutional neural networks},
   	  journal={IEEE Access}, 
 	  volume={},
 	  number={},

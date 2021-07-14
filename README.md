@@ -35,15 +35,15 @@ This work addresses the problem of vehicle re-identification through a network o
 
 ![Alt text](fig1.png)
 
-As our main contribution, we introduce a novel dataset for vehicle identification, called Vehicle-Rear, that contains more than three hours of high-resolution videos, with accurate information about the make, model, color and year of nearly 3,000 vehicles, in addition to the position and identification of their license plates. 
+As our main contribution, we introduce a novel dataset for vehicle identification, called Vehicle-Rear, that contains more than three hours of high-resolution videos, with accurate information about the make, model, color and year of nearly 3,000 vehicles, in addition to the position and identification of their license plates. Here are some examples from the dataset:
 
-![Alt text](dataset.png)
+![Dataset Samples](dataset.png)
 
 Image sequences from the proposed Vehicle-Rear dataset. The temporal sequences show examples of (a) motorcycles; (b) cars and buses; (c) trucks; (a) and (c) in normal weather conditions; (b) dark frames caused by the motion of large vehicles; and (d) severe lighting conditions.
 
 To explore our dataset we design a two-stream Convolutional Neural Network (CNN) that simultaneously uses two of the most distinctive and persistent features available: the vehicle’s appearance and its license plate. This is an attempt to tackle a major problem: false alarms caused by vehicles with similar designs or by very close license plate identifiers. In the first network stream, shape similarities are identified by a Siamese CNN that uses a pair of lowresolution vehicle patches recorded by two different cameras. In the second stream, we use a CNN for Optical Character Recognition (OCR) to extract textual information, confidence scores, and string similarities from a pair of highresolution license plate patches. Then, features from both streams are merged by a sequence of fully connected layers for decision.
 
-![Alt text](fig2.png)
+![Two-Stream architecture](fig2.png)
 
 In our experiments, we compared the two-stream network against several well-known CNN architectures using single or multiple vehicle features. The proposed architecture achieved precision, recall and F-score values of 99.35%, 98.5%, 98.92%, respectively. The combination of both features (vehicle shape and OCR) brought an F-score boost of nearly 5%, solving very challenging instances of this problem such as distinct vehicles with very similar shapes or license plate identifiers.
 
@@ -57,7 +57,7 @@ In our experiments, we compared the two-stream network against several well-know
 
 \
 As an additional contribution, we present three alternative architectures that explore the same features but using additional streams and temporal information.
-![Alt text](fig3.png)
+![Additional Architectures](fig3.png)
 
 Vehicle re-identification performance for alternative architectures that explores the use of additional streams, features, and temporal information. 
 

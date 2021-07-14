@@ -44,18 +44,22 @@ Then, features from both streams are merged by a sequence of fully connected lay
 
 ![Alt text](fig2.png)
 
+| Architectures                                 | Precision      | Recall      | F-score      |
+|-----------------------------------------------|--------|--------|--------|
+| One-Stream (Plate)                            | 88.49% | 75.28% | 80.83% |
+| One-Stream (CNN-OCR)                          | 100.0% | 88.80% | 94.10% |
+| One-Stream (Shape)                            | 90.43% | 92.54% | 91.35% |
+| Two-Stream (Shape + Plate)                    | 91.15% | 91.93% | 91.47% |
+| **Two-Stream (Shape + CNN-OCR)**                  | **99.35%** | **98.50%** | **98.92%** |
+
 As another contribution, we present three alternative architectures that explore the same features but using additional streams and temporal information.
 
 ![Alt text](fig3.png)
 
 Vehicle re-identification performance for alternative architectures that explores the use of additional streams, features and temporal information. 
 
-| Architectures                                 | P      | R      | F      |
+| Architectures                                 | Precision      | Recall      | F-score      |
 |-----------------------------------------------|--------|--------|--------|
-| One-Stream (Plate)                            | 88.49% | 75.28% | 80.83% |
-| One-Stream (CNN-OCR)                          | 100.0% | 88.80% | 94.10% |
-| One-Stream (Shape)                            | 90.43% | 92.54% | 91.35% |
-| Two-Stream (Shape + Plate)                    | 91.15% | 91.93% | 91.47% |
 | Two-Stream (Shape + CNN-OCR)                  | 99.35% | 98.50% | 98.92% |
 | Two-Stream-Temporal, k = 2, (Shape + CNN-OCR) | 99.88% | 98.84% | 99.35% |
 | Two-Stream-Temporal, k = 3, (Shape + CNN-OCR) | 99.74% | 98.77% | 99.26% |

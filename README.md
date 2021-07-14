@@ -83,7 +83,7 @@ from config_1 import *
 
 For example, you can see in the siamese_shape_stream1.py.
 
-OBS: If you don't decompress the data.tgz in the vehicle-ReId folder, change the parameter path in config.py and config1.py with new path of data.
+P.S.: If you don't decompress the data.tgz in the vehicle-ReId folder, change the parameter path in config.py and config1.py with new path of data.
 
 ### 3. Training the algorithms
 In this process, the data are loaded from the JSON file generated for step 6, and it is run the process of training and validation.

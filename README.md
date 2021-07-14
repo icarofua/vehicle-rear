@@ -37,6 +37,10 @@ This work addresses the problem of vehicle re-identification through a network o
 
 As our main contribution, we introduce a novel dataset for vehicle identification, called Vehicle-Rear, that contains more than three hours of high-resolution videos, with accurate information about the make, model, color and year of nearly 3,000 vehicles, in addition to the position and identification of their license plates. 
 
+![Alt text](dataset.png)
+
+Image sequences from the proposed Vehicle-Rear dataset. The temporal sequences show examples of (a) motorcycles; (b) cars and buses; (c) trucks; (a) and (c) in normal weather conditions; (b) dark frames caused by the motion of large vehicles; and (d) severe lighting conditions.
+
 To explore our dataset we design a two-stream Convolutional Neural Network (CNN) that simultaneously uses two of the most distinctive and persistent features available: the vehicle’s appearance and its license plate. This is an attempt to tackle a major problem: false alarms caused by vehicles with similar designs or by very close license plate identifiers. In the first network stream, shape similarities are identified by a Siamese CNN that uses a pair of lowresolution vehicle patches recorded by two different cameras. In the second stream, we use a CNN for Optical Character Recognition (OCR) to extract textual information, confidence scores, and string similarities from a pair of highresolution license plate patches. Then, features from both streams are merged by a sequence of fully connected layers for decision.
 
 ![Alt text](fig2.png)
@@ -59,7 +63,7 @@ Vehicle re-identification performance for alternative architectures that explore
 
 | Architectures                                 | Precision      | Recall      | F-score      |
 |-----------------------------------------------|--------|--------|--------|
-| Two-Stream (Shape + CNN-OCR)                  | 99.35% | 98.50% | 98.92% |
+| **Two-Stream (Shape + CNN-OCR)**                  | **99.35%** | **98.50%** | **98.92%** |
 | Two-Stream-Temporal, k = 2, (Shape + CNN-OCR) | 99.88% | 98.84% | 99.35% |
 | Two-Stream-Temporal, k = 3, (Shape + CNN-OCR) | 99.74% | 98.77% | 99.26% |
 | Three-Stream (Shape + Plate + CNN-OCR)        | 99.52% | 98.09% | 98.80% |

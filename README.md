@@ -52,8 +52,8 @@ Then, features from both streams are merged by a sequence of fully connected lay
 | Two-Stream (Shape + Plate)                    | 91.15% | 91.93% | 91.47% |
 | **Two-Stream (Shape + CNN-OCR)**                  | **99.35%** | **98.50%** | **98.92%** |
 
+\
 As an additional contribution, we present three alternative architectures that explore the same features but using additional streams and temporal information.
-
 ![Alt text](fig3.png)
 
 Vehicle re-identification performance for alternative architectures that explores the use of additional streams, features and temporal information. 

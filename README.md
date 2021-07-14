@@ -1,6 +1,5 @@
 
-# Demo code for "Vehicle-Rear: A New Dataset to Explore Feature Fusion For Vehicle Identification Using Convolutional Neural Networks"
-(https://arxiv.org/abs/1911.05541)
+# Demo code for "Vehicle-Rear: A New Dataset to Explore Feature Fusion For Vehicle Identification Using Convolutional Neural Networks" &ndash; (https://arxiv.org/abs/1911.05541)
 
 ## Demo video [here](https://youtu.be/0FoiyMTTQJs).
 

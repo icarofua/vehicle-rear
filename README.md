@@ -1,5 +1,5 @@
 
-# Demo code for "Vehicle-Rear: A New Dataset to Explore Feature Fusion For Vehicle Identification Using Convolutional Neural Networks" &ndash; (https://arxiv.org/abs/1911.05541)
+# "Vehicle-Rear: A New Dataset to Explore Feature Fusion For Vehicle Identification Using Convolutional Neural Networks" &ndash; (https://arxiv.org/abs/1911.05541)
 
 ## Authors
 Ícaro Oliveira de Oliveira, Rayson Laroca, David Menotti, Keiko Veronica Ono Fonseca, Rodrigo Minetto

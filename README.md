@@ -175,7 +175,7 @@ python3 siamese_plate_stream.py predict sample_plate.json models/Plate
 ```
 
 #### 5.2 Siamese shape
-You can predict the siamese shape with the following models: resnet50, resnet6, resnet8, mccnn, vgg16, googlenet, lenet5, matchnet or smallvgg.
+You can predict the Siamese shape with the following models: resnet50, resnet6, resnet8, mccnn, vgg16, googlenet, lenet5, matchnet or smallvgg.
 
 Example: 
 ```

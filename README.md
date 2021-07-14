@@ -44,7 +44,7 @@ Then, features from both streams are merged by a sequence of fully connected lay
 
 ![Alt text](fig2.png)
 
-As another contribution, we discuss and compare three alternative architectures that explore the same features but using additional streams and temporal information.
+As another contribution, we present three alternative architectures that explore the same features but using additional streams and temporal information.
 
 ![Alt text](fig3.png)
 

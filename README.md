@@ -57,9 +57,9 @@ If you find our work useful in your research, please cite our paper:
 	}
 
 ## Downloads
-- [dataset](http://www.inf.ufpr.br/vri/databases/vehicle-reid/data.tgz)
-- [videos](http://www.inf.ufpr.br/vri/databases/vehicle-reid/videos.tgz)
-- [models](http://www.inf.ufpr.br/vri/databases/vehicle-reid/models.tgz)
+- [Dataset](https://www.inf.ufpr.br/vri/databases/vehicle-reid/data.tgz)
+- [Videos](https://www.inf.ufpr.br/vri/databases/vehicle-reid/videos.tgz)
+- [Models](https://www.inf.ufpr.br/vri/databases/vehicle-reid/models.tgz)
 
 ### 1. Prerequisites
 - Python 3.6.X

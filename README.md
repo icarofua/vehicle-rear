@@ -1,5 +1,5 @@
 
-# Demo code for journal "Vehicle-Rear: A new dataset to explorefeature fusion for vehicle identificationusing convolutional neural networks". (https://arxiv.org/abs/1911.05541)
+# Demo code for "Vehicle-Rear: A New Dataset to Explore Feature Fusion For Vehicle Identification Using Convolutional Neural Networks". (https://arxiv.org/abs/1911.05541)
 
 ## Demo video for journal in [here](https://youtu.be/0FoiyMTTQJs).
 
@@ -35,14 +35,13 @@ This work addresses the problem of vehicle re-identification through a network o
 
 ![Alt text](fig1.png)
 
-As our main contribution, we propose a novel two-stream convolutional neural network (CNN) that simultaneously uses two of the most distinctive and persistent features available: the vehicle appearance and its license plate. This is an attempt to tackle a major problem, false alarms caused by vehicles with similar design or by very close license plate identifiers.
-In the first network stream, shape similarities are identified by a Siamese CNN that uses a pair of low-resolution vehicle patches recorded by two different cameras. 
+As our main contribution, we introduce a novel dataset for vehicle identification, called Vehicle-Rear, that contains more than three hours of high-resolution videos, with accurate information about the make, model, color and year of nearly 3,000 vehicles, in addition to the position and identification of their license plates. 
 
-In the second stream, we use a CNN for optical character recognition (OCR) to extract textual information, confidence scores, and string similarities from a pair of high-resolution license plate patches. 
-
-Then, features from both streams are merged by a sequence of fully connected layers for decision.  As part of this work, we created an important dataset for vehicle re-identification with more than three hours of videos spanning almost 3,000 vehicles. In our experiments, we achieved a precision, recall and F-score values of 99.6%, 99.2% and 99.4%, respectively.
+To explore our dataset we design a two-stream Convolutional Neural Network (CNN) that simultaneously uses two of the most distinctive and persistent features available: the vehicle’s appearance and its license plate. This is an attempt to tackle a major problem: false alarms caused by vehicles with similar designs or by very close license plate identifiers. In the first network stream, shape similarities are identified by a Siamese CNN that uses a pair of lowresolution vehicle patches recorded by two different cameras. In the second stream, we use a CNN for Optical Character Recognition (OCR) to extract textual information, confidence scores, and string similarities from a pair of highresolution license plate patches. Then, features from both streams are merged by a sequence of fully connected layers for decision.
 
 ![Alt text](fig2.png)
+
+In our experiments, we compared the two-stream network against several well-known CNN architectures using single or multiple vehicle features. The proposed architecture achieved precision, recall and F-score values of 99.35%, 98.5%, 98.92%, respectively. The combination of both features (vehicle shape and OCR) brought an F-score boost of nearly 5%, solving very challenging instances of this problem such as distinct vehicles with very similar shapes or license plate identifiers.
 
 | Architectures                                 | Precision      | Recall      | F-score      |
 |-----------------------------------------------|--------|--------|--------|
@@ -56,7 +55,7 @@ Then, features from both streams are merged by a sequence of fully connected lay
 As an additional contribution, we present three alternative architectures that explore the same features but using additional streams and temporal information.
 ![Alt text](fig3.png)
 
-Vehicle re-identification performance for alternative architectures that explores the use of additional streams, features and temporal information. 
+Vehicle re-identification performance for alternative architectures that explores the use of additional streams, features, and temporal information. 
 
 | Architectures                                 | Precision      | Recall      | F-score      |
 |-----------------------------------------------|--------|--------|--------|
@@ -76,10 +75,10 @@ To install all python packages, please run the following command:
 ```
 pip3 install -r requirements.txt
 ```
-## 2 Configuration
+## 2. Configuration
 config.py
 
-If you prefer to run the model in the second gpu you can use config_1.py instead of config.py in the python code.
+If you prefer to run the model in the second GPU you can use config_1.py instead of config.py in the python code.
 
 You need to change the following line:
 from config import *
@@ -90,8 +89,8 @@ For example, you can see in the siamese_shape_stream1.py.
 
 OBS: If you don't decompress the data.tgz in the vehicle-ReId folder, change the parameter path in config.py and config1.py with new path of data.
 
-## 3 Training the algorithms
-In this process, the data are loaded from the json file generated for the step 6, and it is runned the process of training and validation.
+## 3. Training the algorithms
+In this process, the data are loaded from the JSON file generated for step 6, and it is run the process of training and validation.
 
 ### 3.1 siamese plate
 ```
@@ -130,8 +129,8 @@ python3 siamese_temporal2.py train
 python3 siamese_temporal3.py train
 ```
 
-## 4 Testing the algorithms
-In this process, the data are loaded from the json file generated for the step 6.
+## 4. Testing the algorithms
+In this process, the data are loaded from the json file generated for step 6.
 
 ### 4.1 siamese plate
 ```
@@ -139,7 +138,7 @@ python3 siamese_plate_stream.py test models/Plate
 ```
 
 ### 4.2 siamese shape
-You can train the siamese shape with the following algorithms: resnet50, resnet6, resnet8, mccnn, vgg16, googlenet, lenet5, matchnet or smallvgg.
+You can train the siamese shape with the following models: resnet50, resnet6, resnet8, mccnn, vgg16, googlenet, lenet5, matchnet or smallvgg.
 
 Example: 
 ```
@@ -171,8 +170,8 @@ python3 siamese_temporal2.py test models/Temporal2
 python3 siamese_temporal3.py test models/Temporal3
 ```
 
-## 5 Predict the algorithms using some samples
-In this process, for each algorithm is loaded the models and a json file contained the samples.
+## 5. Predict the algorithms using some samples
+In this process, for each algorithm is loaded the models and a JSON file contained the samples.
 
 ### 5.1 siamese plate
 ```
@@ -180,7 +179,7 @@ python3 siamese_plate_stream.py predict sample_plate.json models/Plate
 ```
 
 ### 5.2 siamese shape
-You can predict the siamese shape with the following algorithms: resnet50, resnet6, resnet8, mccnn, vgg16, googlenet, lenet5, matchnet or smallvgg.
+You can predict the siamese shape with the following models: resnet50, resnet6, resnet8, mccnn, vgg16, googlenet, lenet5, matchnet or smallvgg.
 
 Example: 
 ```

@@ -1,5 +1,5 @@
 
-# Demo code for journal "Vehicle Re-identification: exploring feature fusion using multi-stream convolutional networks". (https://arxiv.org/abs/1911.05541)
+# Demo code for journal "Vehicle-Rear: A new dataset to explorefeature fusion for vehicle identificationusing convolutional neural networks". (https://arxiv.org/abs/1911.05541)
 
 ## Demo video for journal in [here](https://youtu.be/0FoiyMTTQJs).
 
@@ -46,6 +46,9 @@ Then, features from both streams are merged by a sequence of fully connected lay
 As another contribution, we discuss and compare three alternative architectures that explore the same features but using additional streams and temporal information.
 
 ![Alt text](fig3.png)
+
+![Alt text](table.png)
+
 
 ## 1. Prerequisites
 - Python 3.6.X

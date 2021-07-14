@@ -7,14 +7,15 @@
 
 If you find our work useful in your research, please cite our paper:
 
-	@article{oliveira2019vehicle,
+	@article{oliveira2021vehicle,
 	  author = {I. O. {de Oliveira} and R. {Laroca} and D. {Menotti} and K. V. O. {Fonseca} and R. {Minetto}},
-	  title = {Vehicle Re-identification: exploring feature fusion using multi-stream convolutional networks},
-	  journal = {arXiv preprint},
-	  volume = {arXiv:1911.05541},
-	  number = {},
-	  pages = {1-11},
-	  year = {2019},
+	  title = {Vehicle-Rear: A new dataset to explorefeature fusion for vehicle identificationusing convolutional neural networks},
+  	  journal={IEEE Access}, 
+	  volume={},
+	  number={},
+	  pages={},
+	  doi={},
+	  year = {2021},
 	}
 
 ## Download

@@ -1,5 +1,5 @@
 
-# "Vehicle-Rear: A New Dataset to Explore Feature Fusion For Vehicle Identification Using Convolutional Neural Networks" &ndash; (https://arxiv.org/abs/1911.05541)
+# "Vehicle-Rear: A New Dataset to Explore Feature Fusion For Vehicle Identification Using Convolutional Neural Networks" &ndash; (https://doi.org/10.1109/ACCESS.2021.3097964)
 
 ## Authors
 Ícaro Oliveira de Oliveira, Rayson Laroca, David Menotti, Keiko Veronica Ono Fonseca, Rodrigo Minetto
@@ -45,16 +45,21 @@ Vehicle re-identification performance for alternative architectures that explore
 
 If you find our work useful in your research, please cite our paper:
 
-	@article{oliveira2021vehicle,
-	  author = {I. O. {de Oliveira} and R. {Laroca} and D. {Menotti} and K. V. O. {Fonseca} and R. {Minetto}},
-	  title = {{Vehicle-Rear}: A new dataset to explore feature fusion for vehicle identification using convolutional neural networks},
-  	  journal={IEEE Access}, 
-	  volume={},
-	  number={},
-	  pages={},
-	  doi={},
-	  year = {2021},
-	}
+* I. O. de Oliveira, R. Laroca, D. Menotti, K. V. O. Fonseca, R. Minetto, “*Vehicle-Rear: A New Dataset to Explore Feature Fusion for Vehicle Identification Using Convolutional Neural Networks*,” IEEE Access, vol. 9, pp. 101065-101077, 2021. [[IEEE Xplore]](https://doi.org/10.1109/ACCESS.2021.3097964) [[arXiv]](https://arxiv.org/abs/1911.05541)
+
+```
+@ARTICLE{oliveira2021vehicle,
+  author = {I. O. {de Oliveira} and R. {Laroca} and D. {Menotti} and K. V. O. {Fonseca} and R. {Minetto}},
+  title={{Vehicle-Rear}: A New Dataset to Explore Feature Fusion for Vehicle Identification Using Convolutional Neural Networks}, 
+  journal={IEEE Access},
+  year={2021},
+  volume={9},
+  number={},
+  pages={101065-101077},
+  ISSN={2169-3536},
+  doi={10.1109/ACCESS.2021.3097964}
+}
+```
 
 ## Downloads
 - [Dataset](https://www.inf.ufpr.br/vri/databases/vehicle-reid/data.tgz)

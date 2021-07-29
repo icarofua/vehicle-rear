@@ -87,8 +87,8 @@ for d in ['Set01','Set02','Set03','Set04','Set05']:
 
       if n1 == n2:
         type1 = POS
-        comb1 = np.random.permutation(comb1)[:amount]
-        comb2 = np.random.permutation(comb2)[:amount]
+        comb1 = np.random.permutation(comb1)
+        comb2 = np.random.permutation(comb2)
         samples = itertools.product(comb1,comb2)
       else:
         type1 = NEG

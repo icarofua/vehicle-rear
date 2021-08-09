@@ -67,7 +67,7 @@ If you find our work useful in your research, please cite our paper:
 - [Models](https://www.inf.ufpr.br/vri/databases/vehicle-reid/models.tgz)
 
 ### 1. Prerequisites
-- Python 3.6.X
+- Python 3.7.4
 - Keras
 - Tensorflow
 - Imgaug

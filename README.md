@@ -176,7 +176,7 @@ In this process, for each algorithm is loaded the models and a JSON file contain
 
 #### 5.1 Siamese plate
 ```
-python3 siamese_plate_stream.py predict sample_plate.json models/Plate
+python3 siamese_plate_stream.py predict sample_plate.json models/model_plate*
 ```
 
 #### 5.2 Siamese shape
@@ -184,32 +184,32 @@ You can predict the Siamese shape with the following models: resnet50, resnet6, 
 
 Example: 
 ```
-python3 siamese_shape_stream.py predict smallvgg sample_shape.json models/Shape/Smallvgg
+python3 siamese_shape_stream.py predict smallvgg sample_shape.json models
 ```
 
 #### 5.3 Siamese two stream (plate + shape)
 ```
-python3 siamese_two_stream.py predict sample_two.json models/Two-Stream-Shape-Plate
+python3 siamese_two_stream.py predict sample_two.json models
 ```
 
 #### 5.4 Siamese three stream (plate + shape + ocr)
 ```
-python3 siamese_three_stream.py predict sample_three.json models/Three-Stream
+python3 siamese_three_stream.py predict sample_three.json models
 ```
 
 #### 5.5 Siamese two stream (ocr + shape)
 ```
-python3 siamese_two_stream_ocr.py predict sample_two_ocr.json models/Two-Stream-Shape-OCR
+python3 siamese_two_stream_ocr.py predict sample_two_ocr.json models
 ```
 
 #### 5.6 Siamese temporal stream with 2 images (ocr + shape)
 ```
-python3 siamese_temporal2.py predict sample_temporal2.json models/Temporal2
+python3 siamese_temporal2.py predict sample_temporal2.json models
 ```
 
 #### 5.7 Siamese temporal stream with 3 images (ocr + shape)
 ```
-python3 siamese_temporal3.py predict sample_temporal3.json models/Temporal3
+python3 siamese_temporal3.py predict sample_temporal3.json models
 ```
 
 #### 5.8 OCR model

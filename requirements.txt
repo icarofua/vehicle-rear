@@ -3,5 +3,5 @@ Keras==2.3.1
 numpy>=1.17.4
 pandas>=0.25.3
 scikit-learn>=0.22
-tensorflow==1.15.2
+tensorflow==1.14.0
 albumentations[imgaug]

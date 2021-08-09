@@ -157,7 +157,7 @@ if __name__ == '__main__':
     for k in range(len(keys)):
       K.clear_session()
       f1 = os.path.join(folder,'model_two_stream_ocr_%d.h5' % (k))
-      model = load_model(f1)
+      model = load_model(f1, custom_objects=customs_func)
       Y_ = model.predict(X)
       results.append(np.argmax(Y_[0]))
       print("model %d: %s" % (k+1,"positive" if results[k]==POS else "negative"))
